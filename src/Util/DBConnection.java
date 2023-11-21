@@ -17,7 +17,6 @@ public class DBConnection {
         }
     }
 
-    // Method to get a database connection
     public static Connection getConnection() throws SQLException {
         if (connection == null || connection.isClosed()) {
             connection = DriverManager.getConnection(DB_URL, USER, PASSWORD);
@@ -25,7 +24,6 @@ public class DBConnection {
         return connection;
     }
 
-    // Method to close the database connection
     public static void closeConnection() throws SQLException {
         if (connection != null && !connection.isClosed()) {
             connection.close();

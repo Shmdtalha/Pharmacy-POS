@@ -1,4 +1,4 @@
 package Model.DAO;
 
-public abstract class ReportDAO {
+public abstract class ReportDAO implements DAO{
 }
