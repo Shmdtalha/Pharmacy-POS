@@ -1,4 +1,6 @@
 package Service;
+import Model.DAO.CategoryDAO;
+import Model.DAO.ProductDAO;
 import Model.Entity.Category;
 import Model.Entity.Product;
 import View.BaseView;
@@ -8,11 +10,19 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class InventoryService extends BaseService{
     InventoryView inventoryView;
+    ProductDAO productDAO;
+    CategoryDAO categoryDAO;
+
     public InventoryService(BaseView view)  {
         super(view);
+        productDAO = new ProductDAO();
+        categoryDAO = new CategoryDAO();
+        inventoryView.updateCategoryList(categoryDAO.loadAll());
+        refreshTable();
     }
 
     @Override
@@ -61,8 +71,12 @@ public class InventoryService extends BaseService{
                 }
 
                 inventoryView.addProductToTable(code, name, quantity, price, selectedCategories.get(0).toString());
-
+                productDAO.save(newProduct);
             }
+        });
+
+        inventoryView.getCategoryList().addListSelectionListener(e -> {
+                refreshTable();
         });
     }
 
@@ -74,4 +88,16 @@ public class InventoryService extends BaseService{
         inventoryView.getPriceField().setText("");
         inventoryView.getCategoryList().clearSelection();
     }
+    void refreshTable(){
+        inventoryView.getInventoryModel().setRowCount(0);
+        List<Product> selectedProducts = productDAO.getProductsByCategories(inventoryView.getCategoryList().getSelectedValuesList());
+        System.out.println("Found " + selectedProducts.size() + " products");
+        for(Product p : selectedProducts){
+            inventoryView.addProductToTable(p.getCode(), p.getName(), p.getStockQuantity(), p.getPrice(), p.getCategories().stream()
+                    .map(Category::getName)
+                    .collect(Collectors.joining(", ")));
+        }
+
+    }
+
 }

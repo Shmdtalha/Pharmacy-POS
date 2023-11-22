@@ -11,6 +11,7 @@ import java.util.ArrayList;
 public class InventoryView extends BaseView {
 
     private JTable inventoryTable;
+
     private DefaultTableModel inventoryModel;
     private JButton addButton, removeButton, updateButton, submitButton;
     private JTextField productcodefield, productNameField, quantityField, priceField;
@@ -36,10 +37,13 @@ public class InventoryView extends BaseView {
         JScrollPane scrollPane = new JScrollPane(inventoryTable);
         add(scrollPane, BorderLayout.CENTER);
 
-        //Initializes category List
+        //Initializes category List and its model
         categoryListModel= new DefaultListModel<>();
         ArrayList<Category> categoryData = new ArrayList<>();
-        categoryData.add(new Category("123", "123", "123"));
+        categoryData.add(new Category("123", "Cough", "Cough"));
+        categoryData.add(new Category("645", "Flu", "Flu medicine"));
+        categoryData.get(1).addSubcategory(new Category("519", "Nasal", "Nasal Flu medicine"));
+
         updateCategoryList(categoryData);
         categoryList = new JList<>(categoryListModel);
         categoryList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION); // Allow multiple selections
@@ -87,6 +91,9 @@ public class InventoryView extends BaseView {
     public JTable getInventoryTable() {
         return inventoryTable;
     }
+    public DefaultTableModel getInventoryModel() {
+        return inventoryModel;
+    }
 
     public JTextField getProductCodeField() { return productcodefield; }
     public JTextField getProductNameField() { return productNameField; }
@@ -101,7 +108,7 @@ public class InventoryView extends BaseView {
         return categoryList;
     }
 
-    public void updateCategoryList(ArrayList<Category> categories) {
+    public void updateCategoryList(java.util.List<Category> categories) {
         SwingUtilities.invokeLater(() -> {
             categoryListModel.clear();
             for (Category category : categories) {
@@ -113,9 +120,7 @@ public class InventoryView extends BaseView {
         });
         }
     public void addProductToTable(String code, String name, int quantity, double price, String category) {
-
         Object[] rowData = new Object[] {code, name, quantity, price, category};
-
         inventoryModel.addRow(rowData);
     }
     }

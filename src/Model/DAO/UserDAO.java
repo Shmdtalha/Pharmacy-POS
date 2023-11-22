@@ -1,12 +1,12 @@
 package Model.DAO;
 
-public class UserDAO implements DAO {
-    @Override
+public class UserDAO {
+
     public void save() {
 
     }
 
-    @Override
+
     public void delete() {
 
     }

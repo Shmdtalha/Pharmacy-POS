@@ -1,13 +1,13 @@
 package Model.DAO;
 
-public class OrderDAO implements DAO{
-    @Override
-    public void save() {
+public class OrderDAO{
+
+    public void save(Object ob) {
 
     }
 
-    @Override
-    public void delete() {
+
+    public void delete(Object ob) {
 
     }
 }
