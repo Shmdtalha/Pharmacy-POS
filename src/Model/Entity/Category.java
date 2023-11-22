@@ -60,4 +60,9 @@ public class Category {
         products.remove(product);
         product.getCategories().remove(this);
     }
+
+    @Override
+    public String toString(){
+        return code+"." + name;
+    }
 }

@@ -1,7 +1,8 @@
+import Service.InventoryService;
 import View.InventoryView;
 
 public class Main {
     public static void main(String[] args) {
-        new InventoryView("Inventory View");
+        new InventoryService(new InventoryView("Inventory View"));
     }
 }

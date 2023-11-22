@@ -14,6 +14,7 @@ public abstract class BaseView extends JFrame {
     }
 
     protected abstract void initializeComponents();
+    
 
 
 }

@@ -7,6 +7,11 @@ public class POSService extends BaseService{
     }
 
     @Override
+    protected void setChildReference() {
+
+    }
+
+    @Override
     protected void checkViewType() {
 
     }

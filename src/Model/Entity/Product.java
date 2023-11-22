@@ -43,4 +43,9 @@ public class Product {
         this.price = price;
         categories = new HashSet<>();
     }
+
+    @Override
+    public String toString(){
+        return code + "." + name + ": " + stockQuantity + " / $" + price;
+    }
 }

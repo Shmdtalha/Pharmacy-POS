@@ -6,9 +6,13 @@ public abstract class BaseService {
     protected BaseView view;
 
     public BaseService(BaseView view) {
-        checkViewType();
-        this.view = view;
+        checkViewType(); //Makes sure that correct view has been added
+        this.view = view; //Passes view of type BaseView
+        setChildReference(); //Passes view of type child, for ease. Not that hard to understand, Ahmed.
+        initialize(); //Refresh and add listener
     }
+
+    protected abstract void setChildReference();
 
     protected abstract void checkViewType();
 

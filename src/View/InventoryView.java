@@ -1,16 +1,19 @@
 package View;
 
 import Model.Entity.Category;
+import Model.Entity.Product;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.ArrayList;
 
 public class InventoryView extends BaseView {
 
     private JTable inventoryTable;
+    private DefaultTableModel inventoryModel;
     private JButton addButton, removeButton, updateButton, submitButton;
-    private JTextField productCodeField, productNameField, quantityField, priceField;
+    private JTextField productcodefield, productNameField, quantityField, priceField;
     private JLabel productCodeLabel, productNameLabel, quantityLabel, priceLabel;
 
     JList<Category> categoryList;
@@ -26,8 +29,10 @@ public class InventoryView extends BaseView {
     @Override
     protected void initializeComponents() {
         setLayout(new BorderLayout());
-
+        String[] columnNames = {"Product Code", "Product Name", "Quantity", "Price", "Category"};
         inventoryTable = new JTable();
+        inventoryModel = new DefaultTableModel(columnNames, 0);
+        inventoryTable.setModel(inventoryModel);
         JScrollPane scrollPane = new JScrollPane(inventoryTable);
         add(scrollPane, BorderLayout.CENTER);
 
@@ -44,7 +49,7 @@ public class InventoryView extends BaseView {
         //Input panel
         JPanel inputPanel = new JPanel(new GridLayout(5, 2, 10, 10)); // 5 rows, 2 columns, 10px gaps
         productCodeLabel = new JLabel("Product Code:");
-        productCodeField = new JTextField();
+        productcodefield = new JTextField();
         productNameLabel = new JLabel("Product Name:");
         productNameField = new JTextField();
         quantityLabel = new JLabel("Quantity:");
@@ -54,7 +59,7 @@ public class InventoryView extends BaseView {
 
        //Adding components to input panel
         inputPanel.add(productCodeLabel);
-        inputPanel.add(productCodeField);
+        inputPanel.add(productcodefield);
         inputPanel.add(productNameLabel);
         inputPanel.add(productNameField);
         inputPanel.add(quantityLabel);
@@ -83,7 +88,7 @@ public class InventoryView extends BaseView {
         return inventoryTable;
     }
 
-    public JTextField getProductCodeField() { return productCodeField; }
+    public JTextField getProductCodeField() { return productcodefield; }
     public JTextField getProductNameField() { return productNameField; }
     public JTextField getQuantityField() { return quantityField; }
     public JTextField getPriceField() { return priceField; }
@@ -91,6 +96,10 @@ public class InventoryView extends BaseView {
     public JButton getRemoveButton() { return removeButton; }
     public JButton getUpdateButton() { return updateButton; }
     public JButton getSubmitButton() { return submitButton; }
+
+    public JList<Category> getCategoryList() {
+        return categoryList;
+    }
 
     public void updateCategoryList(ArrayList<Category> categories) {
         SwingUtilities.invokeLater(() -> {
@@ -103,4 +112,11 @@ public class InventoryView extends BaseView {
             }
         });
         }
+    public void addProductToTable(String code, String name, int quantity, double price, String category) {
+
+        Object[] rowData = new Object[] {code, name, quantity, price, category};
+
+        inventoryModel.addRow(rowData);
     }
+    }
+
