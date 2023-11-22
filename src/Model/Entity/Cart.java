@@ -1,4 +1,4 @@
 package Model.Entity;
 
-public class Cart {
+public class Cart extends ItemContainer{
 }

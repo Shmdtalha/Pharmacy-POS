@@ -10,6 +10,7 @@ public abstract class BaseView extends JFrame {
         setSize(800, 600);
         setLocationRelativeTo(null);
         initializeComponents();
+        setVisible(true);
     }
 
     protected abstract void initializeComponents();

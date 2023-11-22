@@ -7,6 +7,17 @@ public class LoginService extends BaseService{
     }
 
     @Override
+    protected void checkViewType() {
+        try{
+
+        }
+        catch(Exception ex){
+
+        }
+
+    }
+
+    @Override
     protected void addListeners() {
 
     }

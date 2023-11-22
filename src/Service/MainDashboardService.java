@@ -7,6 +7,11 @@ public class MainDashboardService extends BaseService{
     }
 
     @Override
+    protected void checkViewType() {
+
+    }
+
+    @Override
     protected void addListeners() {
 
     }

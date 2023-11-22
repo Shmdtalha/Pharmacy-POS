@@ -6,8 +6,11 @@ public abstract class BaseService {
     protected BaseView view;
 
     public BaseService(BaseView view) {
+        checkViewType();
         this.view = view;
     }
+
+    protected abstract void checkViewType();
 
     protected abstract void addListeners();
     public abstract void refreshView();
