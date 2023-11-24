@@ -66,7 +66,7 @@ public class ProductDAO{
                 .map(code -> "'" + code + "'")
                 .collect(Collectors.joining(","));
 
-        String query = "SELECT p.* FROM Products p " +
+        String query = "SELECT DISTINCT p.* FROM Products p " +
                 "JOIN ProductCategories pc ON p.productCode = pc.productCode " +
                 "WHERE pc.categoryCode IN (" + categoryCodes + ")";
 

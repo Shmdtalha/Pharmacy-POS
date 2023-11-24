@@ -13,7 +13,7 @@ public class InventoryView extends BaseView {
     private JTable inventoryTable;
 
     private DefaultTableModel inventoryModel;
-    private JButton addButton, removeButton, updateButton, submitButton;
+    private JButton addButton, removeButton, updateButton, submitButton, manageCategoriesButton;
     private JTextField productcodefield, productNameField, quantityField, priceField;
     private JLabel productCodeLabel, productNameLabel, quantityLabel, priceLabel;
 
@@ -77,12 +77,14 @@ public class InventoryView extends BaseView {
         removeButton = new JButton("Remove");
         updateButton = new JButton("Update");
         submitButton = new JButton("Submit");
+        manageCategoriesButton = new JButton("Manage Categories");
 
         //Adding components to Button Panel
         buttonPanel.add(addButton);
         buttonPanel.add(removeButton);
         buttonPanel.add(updateButton);
         buttonPanel.add(submitButton);
+        buttonPanel.add(manageCategoriesButton);
 
         // Adding panels to the main frame
         add(inputPanel, BorderLayout.NORTH);
@@ -103,6 +105,8 @@ public class InventoryView extends BaseView {
     public JButton getRemoveButton() { return removeButton; }
     public JButton getUpdateButton() { return updateButton; }
     public JButton getSubmitButton() { return submitButton; }
+
+    public JButton getManageCategoriesButton(){return manageCategoriesButton;}
 
     public JList<Category> getCategoryList() {
         return categoryList;
