@@ -19,13 +19,14 @@ public class ProductDAO{
         String insertProductCategoryQuery = "INSERT INTO ProductCategories (productCode, categoryCode) VALUES (?,?)";
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement pstProduct = conn.prepareStatement(insertProductQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement pstProduct = conn.prepareStatement(insertProductQuery)) {
 
             pstProduct.setString(1, p.getCode());
             pstProduct.setString(2, p.getName());
             pstProduct.setString(3, p.getDescription());
             pstProduct.setInt(4, p.getStockQuantity());
             pstProduct.setDouble(5, p.getPrice());
+            System.out.println(pstProduct);
             int affectedRows = pstProduct.executeUpdate();
 
             if (affectedRows == 0) {
@@ -33,19 +34,13 @@ public class ProductDAO{
                 return;
             }
 
-            try (ResultSet generatedKeys = pstProduct.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    String productCode = generatedKeys.getString(1);
 
-                    try (PreparedStatement pstProductCategory = conn.prepareStatement(insertProductCategoryQuery)) {
-                        for (Category category : p.getCategories()) {
-                            pstProductCategory.setString(1, productCode);
-                            pstProductCategory.setString(2, category.getCode());
-                            pstProductCategory.executeUpdate();
-                        }
-                    }
-                } else {
-                    System.err.println("Creating product failed, no ID obtained.");
+            try (PreparedStatement pstProductCategory = conn.prepareStatement(insertProductCategoryQuery)) {
+                for (Category category : p.getCategories()) {
+                    pstProductCategory.setString(1, p.getCode());
+                    pstProductCategory.setString(2, category.getCode());
+                    System.out.println(pstProductCategory);
+                    pstProductCategory.executeUpdate();
                 }
             }
 
@@ -53,6 +48,7 @@ public class ProductDAO{
             ex.printStackTrace();
         }
     }
+
 
     public List<Product> getProductsByCategories(List<Category> categories) {
         List<Product> products = new ArrayList<>();
@@ -95,6 +91,38 @@ public class ProductDAO{
 
 
     public void delete(Product p) {
+        String deleteProductQuery = "DELETE FROM Products WHERE ProductCode = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstProduct = conn.prepareStatement(deleteProductQuery)) {
 
+            pstProduct.setString(1, p.getCode());
+            int affectedRows = pstProduct.executeUpdate();
+
+            if (affectedRows == 0) {
+                System.err.println("Deleting product failed, no rows affected.");
+            } else {
+                System.out.println("Product deleted successfully.");
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void delete(String productCode) {
+        String deleteProductQuery = "DELETE FROM Products WHERE ProductCode = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstProduct = conn.prepareStatement(deleteProductQuery)) {
+
+            pstProduct.setString(1, productCode);
+            int affectedRows = pstProduct.executeUpdate();
+
+            if (affectedRows == 0) {
+                System.err.println("Deleting product failed, no rows affected.");
+            } else {
+                System.out.println("Product deleted successfully.");
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 }

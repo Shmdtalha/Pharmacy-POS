@@ -18,6 +18,7 @@ public class ManageCategoryView extends JDialog {
 
     public ManageCategoryView(Frame owner, boolean modal) {
         super(owner, modal);
+        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         initUI();
     }
 

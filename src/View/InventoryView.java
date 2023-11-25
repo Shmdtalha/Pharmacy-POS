@@ -46,8 +46,9 @@ public class InventoryView extends BaseView {
 
         updateCategoryList(categoryData);
         categoryList = new JList<>(categoryListModel);
-        categoryList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION); // Allow multiple selections
+        categoryList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION); // Allows multiple selections
         categoryScrollPane = new JScrollPane(categoryList);
+        categoryScrollPane.setPreferredSize(new Dimension(categoryScrollPane.getPreferredSize().width * 2, categoryScrollPane.getPreferredSize().height));
         add(categoryScrollPane, BorderLayout.WEST);
 
         //Input panel
