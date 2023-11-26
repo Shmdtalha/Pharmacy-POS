@@ -1,10 +1,15 @@
 package Model.Entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class ItemContainer {
     protected List<Item> items;
     int id;
+
+    ItemContainer(){
+        items = new ArrayList<>();
+    }
     public List<Item> getItems() { return items; }
     public void setItems(List<Item> items) { this.items = items; }
     public void add(Item it){

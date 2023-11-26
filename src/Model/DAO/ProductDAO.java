@@ -125,4 +125,33 @@ public class ProductDAO{
             ex.printStackTrace();
         }
     }
+
+    public List<Product> searchProductsByName(String name) {
+        List<Product> products = new ArrayList<>();
+        String query = "SELECT * FROM Products WHERE productName LIKE ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pst = conn.prepareStatement(query)) {
+            pst.setString(1, "%" + name + "%");
+            System.out.println(pst);
+
+            try (ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    products.add(new Product(
+                            rs.getString("productCode"),
+                            rs.getString("productName"),
+                            rs.getString("description"),
+                            rs.getInt("stockQuantity"),
+                            rs.getDouble("price")
+                    ));
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return products;
+    }
+
+
 }
