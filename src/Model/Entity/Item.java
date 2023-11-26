@@ -4,7 +4,7 @@ public class Item {
     private int quantityOrdered;
     private double price;
 
-    // Getters and Setters
+    Product product;
     public int getQuantityOrdered() { return quantityOrdered; }
     public void setQuantityOrdered(int quantityOrdered) { this.quantityOrdered = quantityOrdered; }
     public double getPrice() { return price; }
