@@ -1,3 +1,12 @@
+--Table for User
+CREATE TABLE User(
+	id varchar(255) Not null unique primary key,
+    name varchar(255) not null,
+    role varchar(255) not null,
+    username varchar(255) not null,
+    password varchar(255) not null
+);
+
 -- Table for categories
 CREATE TABLE Categories (
     categoryCode VARCHAR(255) NOT NULL UNIQUE,
