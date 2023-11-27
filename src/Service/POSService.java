@@ -1,7 +1,8 @@
 package Service;
 
 import Model.DAO.ProductDAO;
-import Model.Entity.Cart;
+import Model.Entity.CustomerCart;
+import Model.Entity.Item;
 import Model.Entity.Product;
 import View.POSView;
 import View.BaseView;
@@ -18,12 +19,12 @@ import java.util.List;
 public class POSService extends BaseService {
     private POSView posView;
     private ProductDAO productDAO;
-    private Cart cart;
+    private CustomerCart customerCart;
 
     public POSService(BaseView view) {
         super(view);
         this.productDAO = new ProductDAO();
-        cart = new Cart();
+        customerCart = new CustomerCart();
     }
 
     @Override
@@ -75,6 +76,42 @@ public class POSService extends BaseService {
             }
         });
 
+        posView.getItemsModel().addTableModelListener(e -> {
+            if (e.getType() == TableModelEvent.UPDATE) {
+                int row = e.getFirstRow();
+                int column = e.getColumn();
+                if (row >= 0 && (column == 3 || column == 2)) { // Check for quantity or price column
+                    SwingUtilities.invokeLater(() -> {
+                        try {
+                            Object value = posView.getItemsModel().getValueAt(row, column);
+                            if (value != null) {
+                                if (column == 3) { // Quantity column
+                                    int quantity = Integer.parseInt(value.toString());
+                                    if (quantity < 0) {
+                                        JOptionPane.showMessageDialog(posView, "Quantity cannot be negative.");
+                                        posView.getItemsModel().setValueAt(1, row, column); // Reset to default
+                                        return;
+                                    }
+                                } else if (column == 2) { // Price column
+                                    double price = Double.parseDouble(value.toString());
+                                    if (price < 0.0) {
+                                        JOptionPane.showMessageDialog(posView, "Price cannot be negative.");
+                                        posView.getItemsModel().setValueAt(0.0, row, column); // Reset to default
+                                        return;
+                                    }
+                                }
+                                updateRowTotal(row);
+                                updateTotalLabel();
+                            }
+                        } catch (NumberFormatException ex) {
+                            JOptionPane.showMessageDialog(posView, "Please enter a valid number.");
+                            posView.getItemsModel().setValueAt(column == 3 ? 1 : 0.0, row, column); // Reset to default
+                        }
+                    });
+                }
+            }
+        });
+
 
         posView.getAddButton().addActionListener(e -> {
             Product selectedProduct = (Product) posView.getSearchResultsDropdown().getSelectedItem();
@@ -85,12 +122,63 @@ public class POSService extends BaseService {
             }
         });
 
+        posView.getRemoveItemButton().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = posView.getItemsTable().getSelectedRow();
+                if (selectedRow >= 0) {
+
+                    int confirm = JOptionPane.showConfirmDialog(
+                            posView,
+                            "Are you sure you want to remove the selected item?",
+                            "Remove Item",
+                            JOptionPane.YES_NO_OPTION
+                    );
+
+                    if (confirm == JOptionPane.YES_OPTION) {
+                        ((DefaultTableModel) posView.getItemsTable().getModel()).removeRow(selectedRow);
+                        updateTotalLabel();
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(
+                            posView,
+                            "Please select an item to remove.",
+                            "No Item Selected",
+                            JOptionPane.WARNING_MESSAGE
+                    );
+                }
+            }
+        });
+
+
         posView.getGenerateInvoiceButton().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Cart cart = new Cart();
+                DefaultTableModel model = posView.getItemsModel();
+                int totalItems = model.getRowCount();
+                double cartPrice = 0;
+
+                for(int i = 0; i < totalItems; i++){
+                    String productCode = (String) model.getValueAt(i, 0);
+                    String productName = (String) model.getValueAt(i, 1);
+                    double productPrice = (Double) model.getValueAt(i, 2);
+                    int quantity = (Integer) model.getValueAt(i, 3);
+                    double totalPrice = (Double) model.getValueAt(i, 4);
+                    Item rowItem = new Item(quantity, productPrice, totalPrice, productCode, productName);
+                    customerCart.add(rowItem);
+                    cartPrice+=totalPrice;
+                }
+                customerCart.setTotalAmount(cartPrice);
+                customerCart.generateOrder();
+                customerCart.clear();
+
+                refreshView();
 
             }
+        });
+
+        posView.getClearButton().addActionListener(e-> {
+            refreshView();
         });
 
     }
@@ -139,6 +227,7 @@ public class POSService extends BaseService {
         for (int i = 0; i < posView.getItemsModel().getRowCount(); i++) {
             total += (Double) posView.getItemsModel().getValueAt(i, 4);
         }
+
         posView.getTotalLabel().setText("Total: $" + String.format("%.2f", total));
     }
 
