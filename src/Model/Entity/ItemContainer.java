@@ -1,8 +1,34 @@
 package Model.Entity;
 
-public abstract class ItemContainer {
-    protected Item[] items;
+import java.util.ArrayList;
+import java.util.List;
 
-    public Item[] getItems() { return items; }
-    public void setItems(Item[] items) { this.items = items; }
+public abstract class ItemContainer {
+    protected List<Item> items;
+    int id;
+
+    ItemContainer(){
+        items = new ArrayList<>();
+    }
+    public List<Item> getItems() { return items; }
+    public void setItems(List<Item> items) { this.items = items; }
+    public void add(Item it){
+        items.add(it);
+    }
+
+    public void remove(Item it){
+
+    }
+
+    public void update(Item it, int quantity){
+
+    }
+
+    public double total(){
+        double total = 0;
+        for(Item it: items){
+            total+=it.total();
+        }
+        return total;
+    }
 }

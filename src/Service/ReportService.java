@@ -7,6 +7,11 @@ public class ReportService extends BaseService{
     }
 
     @Override
+    public void loadDialogBoxes() {
+
+    }
+
+    @Override
     protected void setChildReference() {
 
     }

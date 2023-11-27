@@ -5,12 +5,16 @@ import View.BaseView;
 public abstract class BaseService {
     protected BaseView view;
 
+
     public BaseService(BaseView view) {
         checkViewType(); //Makes sure that correct view has been added
         this.view = view; //Passes view of type BaseView
         setChildReference(); //Passes view of type child, for ease. Not that hard to understand, Ahmed.
+        loadDialogBoxes();
         initialize(); //Refresh and add listener
     }
+
+    public abstract void loadDialogBoxes();
 
     protected abstract void setChildReference();
 
