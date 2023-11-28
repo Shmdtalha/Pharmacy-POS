@@ -1,7 +1,9 @@
 package Service;
 import Model.DAO.UserDAO;
+import Model.Entity.User;
 import View.BaseView;
 import View.LoginView;
+import View.MainDashboardView;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -47,17 +49,34 @@ public class LoginService extends BaseService{
             @Override
             public void actionPerformed(ActionEvent e) {
                 String username = loginView.getUsernameTextField().getText();
-                if(username == ""){
-                    //create a label which displays the error
+                if(username.isEmpty()){
+                    loginView.showError("Username can not be empty!");
                     return;
                 }
                 String password = loginView.getPasswordTextField().getText();
-                if(password == ""){
-                    //create a label to display the error
+                if(password.isEmpty()){
+                    loginView.showError("Password can not be empty!");
                     return;
                 }
 
-                //checks if person with username and password exists
+                User u = userDAO.findUser(username, password);
+
+                if(u == null){
+                    //display error
+                }
+                else{
+                    SessionInfo.setLoggedInUser(u);
+                }
+
+                loginView.getPasswordTextField().setText("");
+                loginView.getUsernameTextField().setText("");
+
+                //panelName.revalidate();
+                //panelName.repaint();
+                loginView.remove(loginView.getUiPanel());
+                loginView.revalidate();
+                loginView.repaint();
+                new MainDashboardService(new MainDashboardView("Main Dashboard"));
             }
         });
     }

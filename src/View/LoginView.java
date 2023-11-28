@@ -37,26 +37,32 @@ public class LoginView extends BaseView{
         passwordTextField.setPreferredSize(new Dimension(100, 25));
         loginButton = new JButton("Login");
         loginButton.setPreferredSize(new Dimension(100, 60));
-        uiPanel = new JPanel();
-        uiPanel.setPreferredSize(new Dimension(450, 750));
-        usernamePanel = new JPanel();
-        usernamePanel.setPreferredSize(new Dimension(400, 300));
-        passwordPanel = new JPanel();
-        passwordPanel.setPreferredSize(new Dimension(400, 300));
 
-        usernamePanel.add(usernameLabel, BorderLayout.EAST);
-        usernamePanel.add(usernameTextField, BorderLayout.WEST);
+        usernamePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        passwordPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
-        passwordPanel.add(passwordLabel, BorderLayout.EAST);
-        passwordPanel.add(passwordTextField, BorderLayout.WEST);
+        usernamePanel.add(usernameLabel);
+        usernamePanel.add(usernameTextField);
+        passwordPanel.add(passwordLabel);
+        passwordPanel.add(passwordTextField);
+        buttonPanel.add(loginButton);
 
-//        GridLayout gridLayout = new GridLayout(3, 1);
-//        uiPanel.setLayout(gridLayout);
-        uiPanel.add(usernamePanel, BorderLayout.CENTER);
-        uiPanel.add(passwordPanel, BorderLayout.CENTER);
-        uiPanel.add(loginButton, BorderLayout.CENTER);
+
+        uiPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        uiPanel.add(Box.createVerticalStrut(100));
+
+        uiPanel.add(usernamePanel, gbc);
+        uiPanel.add(passwordPanel, gbc);
+        gbc.weighty = 1;
+        uiPanel.add(buttonPanel, gbc);
 
         add(uiPanel, BorderLayout.CENTER);
+    }
+
+    public void showError(String message){
+        JOptionPane.showMessageDialog(uiPanel, message);
     }
 
     public JPanel getUiPanel() {
