@@ -1,12 +1,3 @@
---Table for User
-CREATE TABLE User(
-	id varchar(255) Not null unique primary key,
-    name varchar(255) not null,
-    role varchar(255) not null,
-    username varchar(255) not null,
-    password varchar(255) not null
-);
-
 -- Table for categories
 CREATE TABLE Categories (
     categoryCode VARCHAR(255) NOT NULL UNIQUE,
@@ -75,3 +66,18 @@ INSERT INTO ProductCategories (productCode, categoryCode) VALUES
 ('COLDMED1', 'COLD'),   -- Cold Medicine for Colds
 ('COLDMED1', 'PAINK');  -- Cold Medicine can also relieve pain
 
+
+CREATE TABLE CustomerCarts (
+    cartId VARCHAR(20) NOT NULL PRIMARY KEY,
+    customerName VARCHAR(255) NULL,
+    totalAmount DOUBLE NOT NULL
+);
+
+CREATE TABLE CartProducts (
+    cartId VARCHAR(20) NOT NULL,
+    productCode VARCHAR(255) NOT NULL,
+    quantity INT NOT NULL,
+    productPrice DOUBLE NOT NULL,
+    FOREIGN KEY (cartId) REFERENCES CustomerCarts(cartId),
+    FOREIGN KEY (productCode) REFERENCES Products(productCode)
+);

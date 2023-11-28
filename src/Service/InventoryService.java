@@ -4,6 +4,7 @@ import Model.DAO.ProductDAO;
 import Model.Entity.Category;
 import Model.Entity.Product;
 import View.BaseView;
+import View.DialogWindow.AddCategoryView;
 import View.DialogWindow.ManageCategoryView;
 import View.InventoryView;
 
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 public class InventoryService extends BaseService{
     InventoryView inventoryView;
     ManageCategoryView manageCategoryView;
+    AddCategoryView addCategoryView;
     ProductDAO productDAO;
     CategoryDAO categoryDAO;
 
@@ -33,6 +35,7 @@ public class InventoryService extends BaseService{
     @Override
     public void loadDialogBoxes(){
         manageCategoryView = new ManageCategoryView((Frame) SwingUtilities.getWindowAncestor(view), true);
+        addCategoryView = new AddCategoryView((Frame) SwingUtilities.getWindowAncestor(view), true);
 
     }
 
@@ -104,6 +107,39 @@ public class InventoryService extends BaseService{
 
             }
         });
+
+        inventoryView.getAddCategoryButton().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                addCategoryView.getParentCategoryDropdown().removeAllItems();
+                List<Category> categories = categoryDAO.loadAll();
+                for(Category cat : categories){
+                    addCategoryView.getParentCategoryDropdown().addItem(cat);
+                }
+                addCategoryView.getParentCategoryDropdown().setSelectedIndex(-1);
+
+                addCategoryView.setVisible(true);
+            }
+        });
+
+        addCategoryView.getAddButton().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String code = addCategoryView.getCategoryCodeField().getText();
+                String name = addCategoryView.getCategoryNameField().getText();
+                String description = addCategoryView.getCategoryDescriptionField().getText();
+
+                Category newCategory = new Category(code, name, description);
+                newCategory.setParentCategory((Category)addCategoryView.getParentCategoryDropdown().getSelectedItem());
+                categoryDAO.save(newCategory);
+
+                inventoryView.updateCategoryList(categoryDAO.loadAll());
+                inventoryView.repaint();
+
+            }
+        });
+
+
 
         manageCategoryView.getDeleteButton().addActionListener(new ActionListener() {
             @Override
@@ -219,7 +255,6 @@ public class InventoryService extends BaseService{
         manageCategoryView.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
-                System.out.println("Window closed");
                 inventoryView.updateCategoryList(categoryDAO.loadAll());
                 inventoryView.repaint();
             }
