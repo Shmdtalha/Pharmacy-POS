@@ -13,7 +13,7 @@ public class InventoryView extends BaseView {
     private JTable inventoryTable;
 
     private DefaultTableModel inventoryModel;
-    private JButton addButton, removeButton, updateButton, submitButton, manageCategoriesButton;
+    private JButton addButton, removeButton, updateButton, submitButton, addCategoryButton, manageCategoriesButton;
     private JTextField productcodefield, productNameField, quantityField, priceField;
     private JLabel productCodeLabel, productNameLabel, quantityLabel, priceLabel;
 
@@ -40,9 +40,6 @@ public class InventoryView extends BaseView {
         //Initializes category List and its model
         categoryListModel= new DefaultListModel<>();
         ArrayList<Category> categoryData = new ArrayList<>();
-        categoryData.add(new Category("123", "Cough", "Cough"));
-        categoryData.add(new Category("645", "Flu", "Flu medicine"));
-        categoryData.get(1).addSubcategory(new Category("519", "Nasal", "Nasal Flu medicine"));
 
         updateCategoryList(categoryData);
         categoryList = new JList<>(categoryListModel);
@@ -78,6 +75,7 @@ public class InventoryView extends BaseView {
         removeButton = new JButton("Remove");
         updateButton = new JButton("Update");
         submitButton = new JButton("Submit");
+        addCategoryButton = new JButton("Add Category");
         manageCategoriesButton = new JButton("Manage Categories");
 
         //Adding components to Button Panel
@@ -85,6 +83,7 @@ public class InventoryView extends BaseView {
         buttonPanel.add(removeButton);
         buttonPanel.add(updateButton);
         buttonPanel.add(submitButton);
+        buttonPanel.add(addCategoryButton);
         buttonPanel.add(manageCategoriesButton);
 
         // Adding panels to the main frame
@@ -128,5 +127,9 @@ public class InventoryView extends BaseView {
         Object[] rowData = new Object[] {code, name, quantity, price, category};
         inventoryModel.addRow(rowData);
     }
+
+    public JButton getAddCategoryButton() {
+        return addCategoryButton;
     }
+}
 
