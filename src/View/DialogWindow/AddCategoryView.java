@@ -77,6 +77,7 @@ public class AddCategoryView extends JDialog {
 
     public JButton getAddButton() {
         return addButton;
+
     }
 }
 

@@ -6,6 +6,7 @@ import Model.Entity.Product;
 import View.BaseView;
 import View.DialogWindow.AddCategoryView;
 import View.DialogWindow.ManageCategoryView;
+import View.DialogWindow.ManageExpiryView;
 import View.InventoryView;
 
 import javax.swing.*;
@@ -14,12 +15,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.sql.Date;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class InventoryService extends BaseService{
     InventoryView inventoryView;
     ManageCategoryView manageCategoryView;
+    ManageExpiryView manageExpiryView;
     AddCategoryView addCategoryView;
     ProductDAO productDAO;
     CategoryDAO categoryDAO;
@@ -36,7 +42,7 @@ public class InventoryService extends BaseService{
     public void loadDialogBoxes(){
         manageCategoryView = new ManageCategoryView((Frame) SwingUtilities.getWindowAncestor(view), true);
         addCategoryView = new AddCategoryView((Frame) SwingUtilities.getWindowAncestor(view), true);
-
+        manageExpiryView = new ManageExpiryView((Frame) SwingUtilities.getWindowAncestor(view), true);
     }
 
     @Override
@@ -78,16 +84,35 @@ public class InventoryService extends BaseService{
                 }
 
                 Product newProduct = new Product(code, name, description, quantity, price);
-                System.out.println(newProduct);
                 for (Category category : selectedCategories) {
                     newProduct.addCategory(category);
-                    System.out.println(category.getName());
                 }
 
-                inventoryView.addProductToTable(code, name, quantity, price, selectedCategories.get(0).toString());
-                productDAO.save(newProduct);
+                try {
+                    if (productDAO.productCodeExists(newProduct.getCode())) {
+                        // Show confirmation dialog
+                        int dialogResult = JOptionPane.showConfirmDialog(null, "Product code exists. Do you want to order more products?",
+                                "Product Exists", JOptionPane.YES_NO_OPTION);
+                        if (dialogResult == JOptionPane.YES_OPTION) {
+                            // Asks for new price
+                            String newPriceString = JOptionPane.showInputDialog("Enter new price or leave blank to keep the same:");
+                            Double newPrice = newPriceString.isEmpty() ? newProduct.getPrice() : Double.parseDouble(newPriceString);
+                            newProduct.setPrice(newPrice);
+
+                            // Updates product quantity and price
+                            productDAO.updateProductQuantityAndPrice(newProduct);
+                        }
+                    } else {
+                        // Insert new product
+                        productDAO.save(newProduct);
+                    }
+                } catch(Exception ex){
+                    ex.printStackTrace();
+                }
+
             }
         });
+
 
         inventoryView.getCategoryList().addListSelectionListener(e -> {
                 refreshTable();
@@ -259,6 +284,58 @@ public class InventoryService extends BaseService{
                 inventoryView.repaint();
             }
         });
+
+
+        inventoryView.getManageExpiryButton().addActionListener(e->{
+            manageExpiryView.getProductDropdown().removeAllItems();
+            List<Product> products = productDAO.getProductsByCategories(categoryDAO.loadAll());
+
+            for(Product p: products){
+                manageExpiryView.getProductDropdown().addItem(p);
+            }
+
+            updateManageExpiryView();
+            manageExpiryView.setVisible(true);
+        });
+
+        manageExpiryView.getUpdateButton().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    String productCode = ((Product)(manageExpiryView.getProductDropdown().getSelectedItem())).getCode();
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                    dateFormat.setLenient(false);
+                    Date expiryDate = new Date(dateFormat.parse(manageExpiryView.getExpiryDateField().getText()).getTime());
+                    int batchNum = Integer.parseInt(manageExpiryView.getBatchNumberField().getText());
+                    String location = manageExpiryView.getLocationField().getText();
+
+                    // Prepare the confirmation message
+                    String confirmationMessage = "Are you sure you want to add the following expiry information?\n\n" +
+                            "Product Code: " + productCode + "\n" +
+                            "Batch Number: " + batchNum + "\n" +
+                            "Expiry Date: " + manageExpiryView.getExpiryDateField().getText() + "\n" +
+                            "Location: " + location;
+
+                    // Show confirmation dialog
+                    int confirmation = JOptionPane.showConfirmDialog(manageExpiryView, confirmationMessage,
+                            "Confirm Expiry Information", JOptionPane.YES_NO_OPTION);
+
+                    if (confirmation == JOptionPane.YES_OPTION) {
+                        productDAO.insertExpiryInfo(productCode, batchNum, expiryDate, location);
+                        JOptionPane.showMessageDialog(manageExpiryView, "Expiry information added successfully.");
+                    }
+                    updateManageExpiryView();
+
+                } catch (ParseException ex) {
+                    JOptionPane.showMessageDialog(manageExpiryView, "Error: Invalid date format. Please use dd-MM-yyyy.");
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(manageExpiryView, "Error: " + ex.getMessage());
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+
     }
 
     @Override
@@ -299,6 +376,19 @@ public class InventoryService extends BaseService{
                     .collect(Collectors.joining(", ")));
         }
 
+    }
+
+    private void updateManageExpiryView() {
+        manageExpiryView.getProductDropdown().removeAllItems();
+        List<Product> products = productDAO.getProductsByCategories(categoryDAO.loadAll());
+        for (Product p : products) {
+            manageExpiryView.getProductDropdown().addItem(p);
+        }
+
+        List<String> nearExpiryProducts = productDAO.getProductsNearExpiry();
+        DefaultListModel<String> listModel = new DefaultListModel<>();
+        nearExpiryProducts.forEach(listModel::addElement);
+        manageExpiryView.getUpcomingExpiryList().setModel(listModel);
     }
 
 }

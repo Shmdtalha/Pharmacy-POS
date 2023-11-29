@@ -4,10 +4,7 @@ import Model.Entity.Category;
 import Model.Entity.Product;
 import Util.DBConnection;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,6 +12,58 @@ import java.util.stream.Collectors;
 public class ProductDAO{
 
     public void save(Product p) {
+        if (productCodeExists(p.getCode())) {
+            updateProductQuantityAndPrice(p); // Update existing product's quantity price
+        } else {
+            insertProduct(p); // Insert new product
+        }
+    }
+
+    public boolean productCodeExists(String productCode) {
+        String query = "SELECT COUNT(*) FROM Products WHERE productCode = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pst = conn.prepareStatement(query)) {
+
+            pst.setString(1, productCode);
+            System.out.println(pst);
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException ex) {
+            System.err.println("Error checking product existence: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    public void updateProductQuantityAndPrice(Product p) {
+        String updateQuery = "UPDATE Products SET stockQuantity = stockQuantity + ?, price = ? WHERE productCode = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pst = conn.prepareStatement(updateQuery)) {
+
+            pst.setInt(1, p.getStockQuantity()); // Increment stock quantity
+            pst.setDouble(2, p.getPrice());
+            pst.setString(3, p.getCode());
+
+            System.out.println(pst);
+            int affectedRows = pst.executeUpdate();
+            if (affectedRows == 0) {
+                System.err.println("No rows affected, might indicate that the product does not exist.");
+            } else {
+                System.out.println("Product updated successfully.");
+            }
+        } catch (SQLException ex) {
+            System.err.println("SQL error occurred while updating product: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+
+
+
+    public void insertProduct(Product p) {
         String insertProductQuery = "INSERT INTO Products (productCode, productName, description, stockQuantity, price) VALUES (?,?,?,?,?)";
         String insertProductCategoryQuery = "INSERT INTO ProductCategories (productCode, categoryCode) VALUES (?,?)";
 
@@ -153,5 +202,85 @@ public class ProductDAO{
         return products;
     }
 
+    public void insertExpiryInfo(String productCode, int batchNumber, Date expiryDate, String location) throws SQLException {
+        String insertExpiryQuery = "INSERT INTO expiryTable (productCode, batchNumber, expiryDate, location) VALUES (?, ?, ?, ?)";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pst = conn.prepareStatement(insertExpiryQuery)) {
+            System.out.println(pst);
+
+            pst.setString(1, productCode);
+            pst.setInt(2, batchNumber);
+            pst.setDate(3, expiryDate);
+            pst.setString(4, location);
+
+            int affectedRows = pst.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Inserting expiry info failed, no rows affected.");
+            }
+        }
+    }
+
+    public List<String> getProductsNearExpiry() {
+        List<String> nearExpiryProducts = new ArrayList<>();
+        String query = "SELECT productName, expiryDate, batchNumber, location FROM Products " +
+                "JOIN ExpiryTable ON Products.productCode = ExpiryTable.productCode " +
+                "WHERE expiryDate BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL 30 DAY)";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pst = conn.prepareStatement(query);
+             ResultSet rs = pst.executeQuery()) {
+
+
+
+            while (rs.next()) {
+                String productName = rs.getString("productName");
+                Date expiryDate = rs.getDate("expiryDate");
+                nearExpiryProducts.add(productName + " - Batch " + rs.getInt("batchNumber") + " - Location: " + rs.getString("location") + " - " + expiryDate.toString());
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return nearExpiryProducts;
+    }
+
+
+    public int getStockQuantity(String productCode) throws SQLException {
+        String query = "SELECT stockQuantity FROM Products WHERE productCode = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pst = conn.prepareStatement(query)) {
+
+            pst.setString(1, productCode);
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("stockQuantity");
+                }
+                return 0; // Return 0 if product not found
+            }
+        }
+    }
+
+    public void decreaseProductQuantity(String productCode, int quantity) throws SQLException {
+        String updateQuery = "UPDATE Products SET stockQuantity = stockQuantity - ? WHERE productCode = ?";
+
+        try {
+            Connection conn = DBConnection.getConnection();
+            PreparedStatement pst = conn.prepareStatement(updateQuery);
+
+            pst.setInt(1, quantity);
+            pst.setString(2, productCode);
+
+            System.out.println(pst);
+            int affectedRows = pst.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Updating product quantity failed, no rows affected.");
+            }
+        }
+        catch(SQLException ex){
+            ex.printStackTrace();
+        }
+    }
 
 }
+
+

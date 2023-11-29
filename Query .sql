@@ -81,3 +81,12 @@ CREATE TABLE CartProducts (
     FOREIGN KEY (cartId) REFERENCES CustomerCarts(cartId),
     FOREIGN KEY (productCode) REFERENCES Products(productCode)
 );
+
+CREATE TABLE expiryTable (
+    productCode VARCHAR(255),
+    batchNumber INT,
+    expiryDate DATE,
+    location VARCHAR(255),
+    PRIMARY KEY (productCode, batchNumber),
+    FOREIGN KEY (productCode) REFERENCES Products(productCode)
+);
