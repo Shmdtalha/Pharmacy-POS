@@ -4,10 +4,7 @@ import Model.Entity.Category;
 import Model.Entity.Product;
 import Util.DBConnection;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -153,5 +150,47 @@ public class ProductDAO{
         return products;
     }
 
+    public void insertExpiryInfo(String productCode, int batchNumber, Date expiryDate, String location) throws SQLException {
+        String insertExpiryQuery = "INSERT INTO expiryTable (productCode, batchNumber, expiryDate, location) VALUES (?, ?, ?, ?)";
 
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pst = conn.prepareStatement(insertExpiryQuery)) {
+            System.out.println(pst);
+
+            pst.setString(1, productCode);
+            pst.setInt(2, batchNumber);
+            pst.setDate(3, expiryDate);
+            pst.setString(4, location);
+
+            int affectedRows = pst.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Inserting expiry info failed, no rows affected.");
+            }
+        }
+    }
+
+    public List<String> getProductsNearExpiry() {
+        List<String> nearExpiryProducts = new ArrayList<>();
+        String query = "SELECT productName, expiryDate, batchNumber, location FROM Products " +
+                "JOIN ExpiryTable ON Products.productCode = ExpiryTable.productCode " +
+                "WHERE expiryDate BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL 30 DAY)";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pst = conn.prepareStatement(query);
+             ResultSet rs = pst.executeQuery()) {
+
+
+
+            while (rs.next()) {
+                String productName = rs.getString("productName");
+                Date expiryDate = rs.getDate("expiryDate");
+                nearExpiryProducts.add(productName + " - Batch " + rs.getInt("batchNumber") + " - Location: " + rs.getString("location") + " - " + expiryDate.toString());
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return nearExpiryProducts;
+    }
 }
+
+
