@@ -16,6 +16,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.Date;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -83,16 +84,35 @@ public class InventoryService extends BaseService{
                 }
 
                 Product newProduct = new Product(code, name, description, quantity, price);
-                System.out.println(newProduct);
                 for (Category category : selectedCategories) {
                     newProduct.addCategory(category);
-                    System.out.println(category.getName());
                 }
 
-                inventoryView.addProductToTable(code, name, quantity, price, selectedCategories.get(0).toString());
-                productDAO.save(newProduct);
+                try {
+                    if (productDAO.productCodeExists(newProduct.getCode())) {
+                        // Show confirmation dialog
+                        int dialogResult = JOptionPane.showConfirmDialog(null, "Product code exists. Do you want to order more products?",
+                                "Product Exists", JOptionPane.YES_NO_OPTION);
+                        if (dialogResult == JOptionPane.YES_OPTION) {
+                            // Asks for new price
+                            String newPriceString = JOptionPane.showInputDialog("Enter new price or leave blank to keep the same:");
+                            Double newPrice = newPriceString.isEmpty() ? newProduct.getPrice() : Double.parseDouble(newPriceString);
+                            newProduct.setPrice(newPrice);
+
+                            // Updates product quantity and price
+                            productDAO.updateProductQuantityAndPrice(newProduct);
+                        }
+                    } else {
+                        // Insert new product
+                        productDAO.save(newProduct);
+                    }
+                } catch(Exception ex){
+                    ex.printStackTrace();
+                }
+
             }
         });
+
 
         inventoryView.getCategoryList().addListSelectionListener(e -> {
                 refreshTable();

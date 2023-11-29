@@ -12,6 +12,58 @@ import java.util.stream.Collectors;
 public class ProductDAO{
 
     public void save(Product p) {
+        if (productCodeExists(p.getCode())) {
+            updateProductQuantityAndPrice(p); // Update existing product's quantity price
+        } else {
+            insertProduct(p); // Insert new product
+        }
+    }
+
+    public boolean productCodeExists(String productCode) {
+        String query = "SELECT COUNT(*) FROM Products WHERE productCode = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pst = conn.prepareStatement(query)) {
+
+            pst.setString(1, productCode);
+            System.out.println(pst);
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException ex) {
+            System.err.println("Error checking product existence: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    public void updateProductQuantityAndPrice(Product p) {
+        String updateQuery = "UPDATE Products SET stockQuantity = stockQuantity + ?, price = ? WHERE productCode = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pst = conn.prepareStatement(updateQuery)) {
+
+            pst.setInt(1, p.getStockQuantity()); // Increment stock quantity
+            pst.setDouble(2, p.getPrice());
+            pst.setString(3, p.getCode());
+
+            System.out.println(pst);
+            int affectedRows = pst.executeUpdate();
+            if (affectedRows == 0) {
+                System.err.println("No rows affected, might indicate that the product does not exist.");
+            } else {
+                System.out.println("Product updated successfully.");
+            }
+        } catch (SQLException ex) {
+            System.err.println("SQL error occurred while updating product: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+
+
+
+    public void insertProduct(Product p) {
         String insertProductQuery = "INSERT INTO Products (productCode, productName, description, stockQuantity, price) VALUES (?,?,?,?,?)";
         String insertProductCategoryQuery = "INSERT INTO ProductCategories (productCode, categoryCode) VALUES (?,?)";
 
