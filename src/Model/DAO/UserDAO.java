@@ -42,6 +42,12 @@ public class UserDAO {
                 u.setUsername(count.getString(4));
                 u.setPassword(count.getString(5));
 
+                System.out.println(count.getString(1));
+                System.out.println(count.getString(2));
+                System.out.println(count.getString(3));
+                System.out.println(count.getString(4));
+                System.out.println(count.getString(5));
+
                 if(count.getString(3) == "MANAGER_ROLE"){
                     Manager m = new Manager();
                     u.setRole(m);

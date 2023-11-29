@@ -62,7 +62,9 @@ public class LoginService extends BaseService{
                 User u = userDAO.findUser(username, password);
 
                 if(u == null){
-                    //display error
+                    loginView.showError("Invalid Credentials!");
+                    refreshView();
+                    return;
                 }
                 else{
                     SessionInfo.setLoggedInUser(u);
@@ -71,11 +73,8 @@ public class LoginService extends BaseService{
                 loginView.getPasswordTextField().setText("");
                 loginView.getUsernameTextField().setText("");
 
-                //panelName.revalidate();
-                //panelName.repaint();
-                loginView.remove(loginView.getUiPanel());
-                loginView.revalidate();
-                loginView.repaint();
+                loginView.setVisible(false);
+
                 new MainDashboardService(new MainDashboardView("Main Dashboard"));
             }
         });
