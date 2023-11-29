@@ -23,12 +23,7 @@ public class CustomerCart extends ItemContainer{
     }
 
     public void generateOrder(){
-        CustomerCartDAO customerCartDAO = new CustomerCartDAO();
-        try {
-            customerCartDAO.createCustomerCartWithProducts(this);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+
     }
 
     public String getCustomerName() {

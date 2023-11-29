@@ -191,6 +191,44 @@ public class ProductDAO{
         }
         return nearExpiryProducts;
     }
+
+
+    public int getStockQuantity(String productCode) throws SQLException {
+        String query = "SELECT stockQuantity FROM Products WHERE productCode = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pst = conn.prepareStatement(query)) {
+
+            pst.setString(1, productCode);
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("stockQuantity");
+                }
+                return 0; // Return 0 if product not found
+            }
+        }
+    }
+
+    public void decreaseProductQuantity(String productCode, int quantity) throws SQLException {
+        String updateQuery = "UPDATE Products SET stockQuantity = stockQuantity - ? WHERE productCode = ?";
+
+        try {
+            Connection conn = DBConnection.getConnection();
+            PreparedStatement pst = conn.prepareStatement(updateQuery);
+
+            pst.setInt(1, quantity);
+            pst.setString(2, productCode);
+
+            System.out.println(pst);
+            int affectedRows = pst.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Updating product quantity failed, no rows affected.");
+            }
+        }
+        catch(SQLException ex){
+            ex.printStackTrace();
+        }
+    }
+
 }
 
 
