@@ -14,7 +14,9 @@ public class ManageExpiryView extends JDialog {
     private JTextField locationField;
     private JButton updateButton;
     private JButton deleteButton;
-    private JList<String> upcomingExpiryList; // JList for displaying upcoming expiries
+    private JList<String> upcomingExpiryList;
+    private JList<String> allExpiryList;
+
 
     public ManageExpiryView(Frame owner, boolean modal) {
         super(owner, modal);
@@ -24,7 +26,7 @@ public class ManageExpiryView extends JDialog {
 
     private void initUI() {
         this.setLayout(new BorderLayout());
-        this.setSize(500, 400); // Increased size to accommodate the new list
+        this.setSize(700, 500);
 
         // Initializing components
         productDropdown = new JComboBox<>();
@@ -35,6 +37,7 @@ public class ManageExpiryView extends JDialog {
         updateButton = new JButton("Update");
         deleteButton = new JButton("Delete");
         upcomingExpiryList = new JList<>();
+        allExpiryList = new JList<>();
 
         // Layout components
         JPanel fieldsPanel = new JPanel(new GridLayout(0, 2));
@@ -52,13 +55,20 @@ public class ManageExpiryView extends JDialog {
         buttonPanel.add(updateButton);
         buttonPanel.add(deleteButton);
 
-        JPanel listPanel = new JPanel(new BorderLayout());
-        listPanel.setBorder(BorderFactory.createTitledBorder("Upcoming Expiries"));
-        listPanel.add(new JScrollPane(upcomingExpiryList), BorderLayout.CENTER);
+        JPanel upcomingExpiryPanel = new JPanel(new BorderLayout());
+        upcomingExpiryPanel.setBorder(BorderFactory.createTitledBorder("Upcoming Expiries"));
+        upcomingExpiryPanel.add(new JScrollPane(upcomingExpiryList), BorderLayout.CENTER);
+
+        JPanel allExpiryPanel = new JPanel(new BorderLayout());
+        allExpiryPanel.setBorder(BorderFactory.createTitledBorder("All Expiries"));
+        allExpiryPanel.add(new JScrollPane(allExpiryList), BorderLayout.CENTER);
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, upcomingExpiryPanel, allExpiryPanel);
+        splitPane.setResizeWeight(0.5);
 
         this.add(fieldsPanel, BorderLayout.NORTH);
-        this.add(buttonPanel, BorderLayout.CENTER);
-        this.add(listPanel, BorderLayout.SOUTH);
+        this.add(buttonPanel, BorderLayout.SOUTH);
+        this.add(splitPane, BorderLayout.CENTER);
     }
 
 
@@ -89,4 +99,8 @@ public class ManageExpiryView extends JDialog {
     public JList<String> getUpcomingExpiryList() {
         return upcomingExpiryList;
     }
+    public JList<String> getAllExpiryList() {
+        return allExpiryList;
+    }
+
 }
