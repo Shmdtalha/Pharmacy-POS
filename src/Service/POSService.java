@@ -71,19 +71,6 @@ public class POSService extends BaseService {
             if (e.getType() == TableModelEvent.UPDATE) {
                 int row = e.getFirstRow();
                 int column = e.getColumn();
-                if (row >= 0 && column >= 0) {
-                    SwingUtilities.invokeLater(() -> {
-                        updateRowTotal(row);
-                        updateTotalLabel();
-                    });
-                }
-            }
-        });
-
-        posView.getItemsModel().addTableModelListener(e -> {
-            if (e.getType() == TableModelEvent.UPDATE) {
-                int row = e.getFirstRow();
-                int column = e.getColumn();
                 if (row >= 0 && (column == 3 || column == 2)) { // Check for quantity or price column
                     SwingUtilities.invokeLater(() -> {
                         try {

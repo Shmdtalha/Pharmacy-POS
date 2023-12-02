@@ -15,7 +15,7 @@ public class CustomerCartDAO {
 
     public void createCustomerCartWithProducts(CustomerCart customerCart, ProductDAO productDAO) throws SQLException {
         // Generate timestamp-based ID
-        SimpleDateFormat ft = new SimpleDateFormat("yyMMddhhmmssMs");
+        SimpleDateFormat ft = new SimpleDateFormat("yyMMddhhmmss");
         String datetime = ft.format(new Date());
 
         // Use the generated ID for cartId
