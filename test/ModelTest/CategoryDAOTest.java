@@ -1,4 +1,4 @@
-package Model;
+package ModelTest;
 
 import Model.DAO.CategoryDAO;
 import Model.Entity.Category;
