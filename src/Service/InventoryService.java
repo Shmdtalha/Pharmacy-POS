@@ -335,6 +335,40 @@ public class InventoryService extends BaseService{
             }
         });
 
+        manageExpiryView.getDeleteButton().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Product selectedProduct = (Product) manageExpiryView.getProductDropdown().getSelectedItem();
+                String batchNumber = manageExpiryView.getBatchNumberField().getText().trim();
+                String location = manageExpiryView.getLocationField().getText().trim();
+
+                if (selectedProduct != null) {
+                    // Confirmation dialog
+                    int confirmation = JOptionPane.showConfirmDialog(manageExpiryView,
+                            "Are you sure you want to delete the expiry information for " +
+                                    selectedProduct.getName() +
+                                    (batchNumber.isEmpty() ? "" : ", Batch: " + batchNumber) +
+                                    (location.isEmpty() ? "" : ", Location: " + location) + "?",
+                            "Confirm Deletion", JOptionPane.YES_NO_OPTION);
+
+                    if (confirmation == JOptionPane.YES_OPTION) {
+                        try {
+                            productDAO.deleteExpiryInfo(selectedProduct.getCode(), batchNumber, location);
+                            JOptionPane.showMessageDialog(manageExpiryView, "Expiry information deleted successfully.");
+                            updateManageExpiryView();
+                        } catch (SQLException ex) {
+                            JOptionPane.showMessageDialog(manageExpiryView, "Error: " + ex.getMessage());
+                            ex.printStackTrace();
+                        }
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(manageExpiryView, "Please select a product.");
+                }
+            }
+        });
+
+
+
 
     }
 
@@ -345,6 +379,7 @@ public class InventoryService extends BaseService{
         inventoryView.getQuantityField().setText("");
         inventoryView.getPriceField().setText("");
         inventoryView.getCategoryList().clearSelection();
+
     }
 
     private void resetFieldEditability() {
@@ -366,29 +401,33 @@ public class InventoryService extends BaseService{
             manageCategoryView.getCategoryDropdown().addItem(cat);
         }
     }
-    void refreshTable(){
+    void refreshTable() {
         inventoryView.getInventoryModel().setRowCount(0);
         List<Product> selectedProducts = productDAO.getProductsByCategories(inventoryView.getCategoryList().getSelectedValuesList());
-        System.out.println("Found " + selectedProducts.size() + " products");
-        for(Product p : selectedProducts){
-            inventoryView.addProductToTable(p.getCode(), p.getName(), p.getStockQuantity(), p.getPrice(), p.getCategories().stream()
-                    .map(Category::getName)
-                    .collect(Collectors.joining(", ")));
+        for(Product p : selectedProducts) {
+            inventoryView.addProductToTable(
+                    p.getCode(),
+                    p.getName(),
+                    p.getStockQuantity(),
+                    p.getPrice(),
+                    p.getParentCategoryName()
+            );
         }
-
     }
 
-    private void updateManageExpiryView() {
-        manageExpiryView.getProductDropdown().removeAllItems();
-        List<Product> products = productDAO.getProductsByCategories(categoryDAO.loadAll());
-        for (Product p : products) {
-            manageExpiryView.getProductDropdown().addItem(p);
-        }
 
+    private void updateManageExpiryView() {
+        // Update upcoming expiries
         List<String> nearExpiryProducts = productDAO.getProductsNearExpiry();
-        DefaultListModel<String> listModel = new DefaultListModel<>();
-        nearExpiryProducts.forEach(listModel::addElement);
-        manageExpiryView.getUpcomingExpiryList().setModel(listModel);
+        DefaultListModel<String> upcomingListModel = new DefaultListModel<>();
+        nearExpiryProducts.forEach(upcomingListModel::addElement);
+        manageExpiryView.getUpcomingExpiryList().setModel(upcomingListModel);
+
+        // Update all expiries
+        List<String> allExpiryProducts = productDAO.getAllExpiryInfo(); // This method needs to be implemented in ProductDAO
+        DefaultListModel<String> allListModel = new DefaultListModel<>();
+        allExpiryProducts.forEach(allListModel::addElement);
+        manageExpiryView.getAllExpiryList().setModel(allListModel);
     }
 
 }

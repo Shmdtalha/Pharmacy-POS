@@ -5,16 +5,16 @@ import Model.DAO.ProductDAO;
 import Model.Entity.CustomerCart;
 import Model.Entity.Item;
 import Model.Entity.Product;
+import View.DialogWindow.InvoiceDetailsView;
+import View.DialogWindow.ManageCategoryView;
 import View.POSView;
 import View.BaseView;
 
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.*;
+import java.awt.event.*;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -22,6 +22,7 @@ public class POSService extends BaseService {
     private POSView posView;
     private ProductDAO productDAO;
     private CustomerCart customerCart;
+    InvoiceDetailsView invoiceDetailsView;
 
     public POSService(BaseView view) {
         super(view);
@@ -31,6 +32,7 @@ public class POSService extends BaseService {
 
     @Override
     public void loadDialogBoxes() {
+        invoiceDetailsView = new InvoiceDetailsView((Frame) SwingUtilities.getWindowAncestor(view), true);
 
     }
 
@@ -179,10 +181,9 @@ public class POSService extends BaseService {
                     }
 
                     customerCart.setTotalAmount(cartPrice);
-                    new CustomerCartDAO().createCustomerCartWithProducts(customerCart, productDAO);
-                    customerCart.clear();
-                    refreshView();
-                    JOptionPane.showMessageDialog(posView, "Order processed successfully.");
+                    invoiceDetailsView.getInvoiceAmountField().setText(String.valueOf(customerCart.getTotalAmount()));
+                    invoiceDetailsView.setVisible(true);
+
 
                 } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(posView, "Error: " + ex.getMessage());
@@ -190,6 +191,41 @@ public class POSService extends BaseService {
                 }
             }
         });
+
+        invoiceDetailsView.getGenerateInvoiceButton().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                try {
+                    customerCart.setCustomerName(invoiceDetailsView.getCustomerNameField().getText());
+                    new CustomerCartDAO().createCustomerCartWithProducts(customerCart, productDAO);
+                    customerCart.clear();
+                    refreshView();
+                    JOptionPane.showMessageDialog(posView, "Order processed successfully.");
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        });
+
+        invoiceDetailsView.getAmountPaidField().addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                Double change = Double.parseDouble(invoiceDetailsView.getAmountPaidField().getText()) - Double.parseDouble(invoiceDetailsView.getInvoiceAmountField().getText());
+                invoiceDetailsView.getChangeField().setText(String.valueOf(change));
+            }
+        });
+
         posView.getClearButton().addActionListener(e-> {
             refreshView();
         });

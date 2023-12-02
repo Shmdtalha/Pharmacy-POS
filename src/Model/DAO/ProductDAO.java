@@ -102,10 +102,9 @@ public class ProductDAO{
     public List<Product> getProductsByCategories(List<Category> categories) {
         List<Product> products = new ArrayList<>();
         if (categories == null || categories.isEmpty()) {
-            return products; // Return an empty list if no categories are provided.
+            return products;
         }
 
-        // Make list of category IDs
         String categoryCodes = categories.stream()
                 .map(Category::getCode)
                 .map(code -> "'" + code + "'")
@@ -118,24 +117,24 @@ public class ProductDAO{
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pst = conn.prepareStatement(query);
              ResultSet rs = pst.executeQuery()) {
-            System.out.println(pst);
 
             while (rs.next()) {
-                products.add(new Product(
+                Product product = new Product(
                         rs.getString("productCode"),
                         rs.getString("productName"),
                         rs.getString("description"),
                         rs.getInt("stockQuantity"),
                         rs.getDouble("price")
-                ));
+                );
+                products.add(product);
             }
-
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-
         return products;
     }
+
+
 
 
 
@@ -280,6 +279,55 @@ public class ProductDAO{
             ex.printStackTrace();
         }
     }
+
+
+    public void deleteExpiryInfo(String productCode, String batchNumber, String location) throws SQLException {
+        String deleteQuery = "DELETE FROM ExpiryTable WHERE productCode = ?" +
+                (batchNumber.isEmpty() ? "" : " AND batchNumber = ?") +
+                (location.isEmpty() ? "" : " AND location = ?");
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pst = conn.prepareStatement(deleteQuery)) {
+
+
+            pst.setString(1, productCode);
+            int paramIndex = 2;
+            if (!batchNumber.isEmpty()) {
+                pst.setString(paramIndex++, batchNumber);
+            }
+            if (!location.isEmpty()) {
+                pst.setString(paramIndex, location);
+            }
+
+            System.out.println(pst);
+            int affectedRows = pst.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("No expiry information found for the specified criteria.");
+            }
+        }
+    }
+
+    public List<String> getAllExpiryInfo() {
+        List<String> allExpiryInfo = new ArrayList<>();
+        String query = "SELECT productName, expiryDate, batchNumber, location FROM Products " +
+                "JOIN ExpiryTable ON Products.productCode = ExpiryTable.productCode";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pst = conn.prepareStatement(query);
+             ResultSet rs = pst.executeQuery()) {
+
+            while (rs.next()) {
+                String productName = rs.getString("productName");
+                Date expiryDate = rs.getDate("expiryDate");
+                allExpiryInfo.add(productName + " - Batch " + rs.getInt("batchNumber") + " - Location: " + rs.getString("location") + " - " + expiryDate.toString());
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return allExpiryInfo;
+    }
+
+
 
 }
 
