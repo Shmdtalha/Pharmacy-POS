@@ -7,8 +7,8 @@ public class Category {
     private String code;
     private String name;
     private String description;
-    private Set<Product> products;
-    private Set<Category> subcategories;
+    private final Set<Product> products;
+    private final Set<Category> subcategories;
     private Category parentCategory;
 
 

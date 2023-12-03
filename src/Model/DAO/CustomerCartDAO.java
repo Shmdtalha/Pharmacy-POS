@@ -26,7 +26,7 @@ public class CustomerCartDAO {
 
         try(Connection conn = DBConnection.getConnection();
             PreparedStatement pstCart = conn.prepareStatement(insertCartQuery);
-            PreparedStatement pstCartProduct = conn.prepareStatement(insertCartProductQuery);
+            PreparedStatement pstCartProduct = conn.prepareStatement(insertCartProductQuery)
         )
         {
             // Insert the cart with the generated ID
