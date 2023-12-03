@@ -1,23 +1,26 @@
 package Service;
 
+import Model.DAO.CustomerCartDAO;
 import Model.DAO.ProductDAO;
 import Model.Entity.CustomerCart;
 import Model.Entity.Item;
 import Model.Entity.Product;
+import View.DialogWindow.InvoiceDetailsView;
+import View.DialogWindow.ManageCategoryView;
 import View.POSView;
 import View.BaseView;
 
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.*;
+import java.awt.event.*;
+import java.sql.SQLException;
 import java.util.List;
 
 public class POSService extends BaseService {
     private POSView posView;
+
     private final ProductDAO productDAO;
     private final CustomerCart customerCart;
 
@@ -29,6 +32,7 @@ public class POSService extends BaseService {
 
     @Override
     public void loadDialogBoxes() {
+        invoiceDetailsView = new InvoiceDetailsView((Frame) SwingUtilities.getWindowAncestor(view), true);
 
     }
 
@@ -59,19 +63,6 @@ public class POSService extends BaseService {
                     updateSearchResultsDropdown(searchResults);
                 } else {
                     posView.getSearchResultsDropdown().setModel(new DefaultComboBoxModel<>());
-                }
-            }
-        });
-
-        posView.getItemsModel().addTableModelListener(e -> {
-            if (e.getType() == TableModelEvent.UPDATE) {
-                int row = e.getFirstRow();
-                int column = e.getColumn();
-                if (row >= 0 && column >= 0) {
-                    SwingUtilities.invokeLater(() -> {
-                        updateRowTotal(row);
-                        updateTotalLabel();
-                    });
                 }
             }
         });
@@ -158,22 +149,67 @@ public class POSService extends BaseService {
                 int totalItems = model.getRowCount();
                 double cartPrice = 0;
 
-                for(int i = 0; i < totalItems; i++){
-                    String productCode = (String) model.getValueAt(i, 0);
-                    String productName = (String) model.getValueAt(i, 1);
-                    double productPrice = (Double) model.getValueAt(i, 2);
-                    int quantity = (Integer) model.getValueAt(i, 3);
-                    double totalPrice = (Double) model.getValueAt(i, 4);
-                    Item rowItem = new Item(quantity, productPrice, totalPrice, productCode, productName);
-                    customerCart.add(rowItem);
-                    cartPrice+=totalPrice;
+                try {
+                    for (int i = 0; i < totalItems; i++) {
+                        String productCode = (String) model.getValueAt(i, 0);
+                        int quantityNeeded = (Integer) model.getValueAt(i, 3);
+
+                        int currentStock = productDAO.getStockQuantity(productCode);
+                        if (quantityNeeded > currentStock) {
+                            JOptionPane.showMessageDialog(posView, "Insufficient stock for product: " + productCode);
+                            return; // Stop processing further
+                        }
+
+                        double productPrice = (Double) model.getValueAt(i, 2);
+                        double totalPrice = (Double) model.getValueAt(i, 4);
+                        Item rowItem = new Item(quantityNeeded, productPrice, totalPrice, productCode, "");
+                        customerCart.add(rowItem);
+                        cartPrice += totalPrice;
+                    }
+
+                    customerCart.setTotalAmount(cartPrice);
+                    invoiceDetailsView.getInvoiceAmountField().setText(String.valueOf(customerCart.getTotalAmount()));
+                    invoiceDetailsView.setVisible(true);
+
+
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(posView, "Error: " + ex.getMessage());
+                    ex.printStackTrace();
                 }
-                customerCart.setTotalAmount(cartPrice);
-                customerCart.generateOrder();
-                customerCart.clear();
+            }
+        });
 
-                refreshView();
+        invoiceDetailsView.getGenerateInvoiceButton().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
 
+                try {
+                    customerCart.setCustomerName(invoiceDetailsView.getCustomerNameField().getText());
+                    new CustomerCartDAO().createCustomerCartWithProducts(customerCart, productDAO);
+                    customerCart.clear();
+                    refreshView();
+                    JOptionPane.showMessageDialog(posView, "Order processed successfully.");
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        });
+
+        invoiceDetailsView.getAmountPaidField().addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                Double change = Double.parseDouble(invoiceDetailsView.getAmountPaidField().getText()) - Double.parseDouble(invoiceDetailsView.getInvoiceAmountField().getText());
+                invoiceDetailsView.getChangeField().setText(String.valueOf(change));
             }
         });
 

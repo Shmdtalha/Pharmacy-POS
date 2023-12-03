@@ -13,9 +13,9 @@ import java.util.List;
 
 public class CustomerCartDAO {
 
-    public void createCustomerCartWithProducts(CustomerCart customerCart) throws SQLException {
+    public void createCustomerCartWithProducts(CustomerCart customerCart, ProductDAO productDAO) throws SQLException {
         // Generate timestamp-based ID
-        SimpleDateFormat ft = new SimpleDateFormat("yyMMddhhmmssMs");
+        SimpleDateFormat ft = new SimpleDateFormat("yyMMddhhmmss");
         String datetime = ft.format(new Date());
 
         // Use the generated ID for cartId
@@ -41,13 +41,16 @@ public class CustomerCartDAO {
             }
 
             List<Item> cartItems = customerCart.getItems();
-            // Insert the order products
+            // Insert the order products and decrease product quantity
             for (Item item : cartItems) {
                 pstCartProduct.setString(1, customerCart.getCartId());
                 pstCartProduct.setString(2, item.getProductCode());
                 pstCartProduct.setInt(3, item.getQuantity());
                 pstCartProduct.setDouble(4, item.getProductPrice());
                 pstCartProduct.addBatch();
+
+                // Decrease the product quantity in stock
+                productDAO.decreaseProductQuantity(item.getProductCode(), item.getQuantity());
             }
             pstCartProduct.executeBatch();
             System.out.println(pstCartProduct);

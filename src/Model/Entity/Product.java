@@ -10,6 +10,8 @@ public class Product {
     private int stockQuantity;
     private double price;
 
+    String parentCategoryName;
+
     public String getCode() { return code; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -38,6 +40,14 @@ public class Product {
         this.stockQuantity = stockQuantity;
         this.price = price;
         categories = new HashSet<>();
+    }
+
+    public void setParentCategoryName(String parentCategoryName) {
+        this.parentCategoryName = parentCategoryName;
+    }
+
+    public String getParentCategoryName() {
+        return parentCategoryName;
     }
 
     @Override

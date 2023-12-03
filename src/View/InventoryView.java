@@ -13,7 +13,7 @@ public class InventoryView extends BaseView {
     private JTable inventoryTable;
 
     private DefaultTableModel inventoryModel;
-    private JButton addButton, removeButton, updateButton, submitButton, addCategoryButton, manageCategoriesButton;
+    private JButton addButton, removeButton, updateButton, submitButton, addCategoryButton, manageCategoriesButton, manageExpiryButton;
     private JTextField productcodefield, productNameField, quantityField, priceField;
     private JLabel productCodeLabel, productNameLabel, quantityLabel, priceLabel;
 
@@ -45,7 +45,7 @@ public class InventoryView extends BaseView {
         categoryList = new JList<>(categoryListModel);
         categoryList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION); // Allows multiple selections
         categoryScrollPane = new JScrollPane(categoryList);
-        categoryScrollPane.setPreferredSize(new Dimension(categoryScrollPane.getPreferredSize().width * 2, categoryScrollPane.getPreferredSize().height));
+        //categoryScrollPane.setPreferredSize(new Dimension(categoryScrollPane.getPreferredSize().width * 2, categoryScrollPane.getPreferredSize().height));
         add(categoryScrollPane, BorderLayout.WEST);
 
         //Input panel
@@ -77,6 +77,7 @@ public class InventoryView extends BaseView {
         submitButton = new JButton("Submit");
         addCategoryButton = new JButton("Add Category");
         manageCategoriesButton = new JButton("Manage Categories");
+        manageExpiryButton = new JButton("Manage Expiry");
 
         //Adding components to Button Panel
         buttonPanel.add(addButton);
@@ -85,6 +86,7 @@ public class InventoryView extends BaseView {
         buttonPanel.add(submitButton);
         buttonPanel.add(addCategoryButton);
         buttonPanel.add(manageCategoriesButton);
+        buttonPanel.add(manageExpiryButton);
 
         // Adding panels to the main frame
         add(inputPanel, BorderLayout.NORTH);
@@ -105,6 +107,7 @@ public class InventoryView extends BaseView {
     public JButton getRemoveButton() { return removeButton; }
     public JButton getUpdateButton() { return updateButton; }
     public JButton getSubmitButton() { return submitButton; }
+    public JButton getManageExpiryButton() { return manageExpiryButton; }
 
     public JButton getManageCategoriesButton(){return manageCategoriesButton;}
 
