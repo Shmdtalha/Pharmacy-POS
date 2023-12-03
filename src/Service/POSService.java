@@ -20,9 +20,9 @@ import java.util.List;
 
 public class POSService extends BaseService {
     private POSView posView;
-    private ProductDAO productDAO;
-    private CustomerCart customerCart;
-    InvoiceDetailsView invoiceDetailsView;
+
+    private final ProductDAO productDAO;
+    private final CustomerCart customerCart;
 
     public POSService(BaseView view) {
         super(view);

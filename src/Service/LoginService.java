@@ -11,7 +11,7 @@ import java.awt.event.ActionListener;
 public class LoginService extends BaseService{
     private LoginView loginView;
 
-    private UserDAO userDAO;
+    private final UserDAO userDAO;
 
     public LoginService(BaseView view) {
         super(view);
