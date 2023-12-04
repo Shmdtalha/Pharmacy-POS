@@ -11,8 +11,21 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * The CustomerCartDAO (Data Access Object) class handles database operations related to customer carts.
+ * This includes creating customer carts with products and managing their related database interactions.
+ */
 public class CustomerCartDAO {
 
+    /**
+     * The method generates a unique timestamp-based ID for each cart, inserts the cart
+     * into the CustomerCarts table, and inserts each product in the cart into the CartProducts table.
+     * It also updates the stock quantity of each product in the cart.
+     *
+     * @param customerCart The customer cart to be created in the database.
+     * @param productDAO The ProductDAO instance for handling product-related operations.
+     * @throws SQLException if there is an error in database access or query execution.
+     */
     public void createCustomerCartWithProducts(CustomerCart customerCart, ProductDAO productDAO) throws SQLException {
         // Generate timestamp-based ID
         SimpleDateFormat ft = new SimpleDateFormat("yyMMddhhmmss");

@@ -3,6 +3,10 @@ package View;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * The LoginView class presents a user interface for logging into the system.
+ * It includes fields for username and password and a login button.
+ */
 public class LoginView extends BaseView{
 
     private JPanel uiPanel;
@@ -25,6 +29,10 @@ public class LoginView extends BaseView{
         super(title);
     }
 
+    /**
+     * Initializes the User interface components
+     * through this inherited method.
+     */
     @Override
     protected void initializeComponents() {
 

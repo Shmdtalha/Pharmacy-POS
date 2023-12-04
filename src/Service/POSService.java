@@ -24,6 +24,8 @@ public class POSService extends BaseService {
     private final ProductDAO productDAO;
     private final CustomerCart customerCart;
 
+    InvoiceDetailsView invoiceDetailsView;
+
     public POSService(BaseView view) {
         super(view);
         this.productDAO = new ProductDAO();
