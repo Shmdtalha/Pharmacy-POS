@@ -18,6 +18,11 @@ public class Product {
     public String getDescription() { return description; }
     public int getStockQuantity() { return stockQuantity; }
     public double getPrice() { return price; }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
     private final Set<Category> categories;
     public void addCategory(Category category) {
         categories.add(category);

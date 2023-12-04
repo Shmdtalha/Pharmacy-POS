@@ -6,6 +6,10 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
+/**
+ * The POSView class represents the point of sale interface.
+ * It includes features for searching products, adding items to the sale, and generating invoices.
+ */
 public class POSView extends BaseView {
 
     private JTable itemsTable;
@@ -16,10 +20,18 @@ public class POSView extends BaseView {
     private JLabel totalLabel;
     private JButton addButton, clearButton, removeItemButton, generateInvoiceButton;
 
+    /**
+     * The POSView class represents the point of sale interface.
+     * It includes features for searching products, adding items to the sale, and generating invoices.
+     */
     public POSView(String title) {
         super(title);
     }
 
+    /**
+     * Initializes the User interface components
+     * through this inherited method.
+     */
     @Override
     protected void initializeComponents() {
         setLayout(new BorderLayout());

@@ -9,8 +9,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * The ProductDAO (Data Access Object) class is responsible for handling all database operations
+ * related to products. This includes saving, updating, inserting, deleting products, and managing
+ * product expiry information.
+ */
 public class ProductDAO{
 
+    /**
+     * Saves a product to the database. If the product code exists, it updates the product's
+     * quantity and price, otherwise, it inserts a new product.
+     *
+     * @param p The product to be saved.
+     */
     public void save(Product p) {
         if (productCodeExists(p.getCode())) {
             updateProductQuantityAndPrice(p); // Update existing product's quantity price
@@ -19,6 +30,12 @@ public class ProductDAO{
         }
     }
 
+    /**
+     * Checks if a product code exists in the database.
+     *
+     * @param productCode The product code to check.
+     * @return True if the product code exists, false otherwise.
+     */
     public boolean productCodeExists(String productCode) {
         String query = "SELECT COUNT(*) FROM Products WHERE productCode = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -38,6 +55,12 @@ public class ProductDAO{
         return false;
     }
 
+
+    /**
+     * Updates the quantity and price of an existing product in the database.
+     *
+     * @param p The product with updated information.
+     */
     public void updateProductQuantityAndPrice(Product p) {
         String updateQuery = "UPDATE Products SET stockQuantity = stockQuantity + ?, price = ? WHERE productCode = ?";
 
@@ -62,7 +85,11 @@ public class ProductDAO{
     }
 
 
-
+    /**
+     * Inserts a new product into the database.
+     *
+     * @param p The new product to be inserted.
+     */
     public void insertProduct(Product p) {
         String insertProductQuery = "INSERT INTO Products (productCode, productName, description, stockQuantity, price) VALUES (?,?,?,?,?)";
         String insertProductCategoryQuery = "INSERT INTO ProductCategories (productCode, categoryCode) VALUES (?,?)";
@@ -137,7 +164,11 @@ public class ProductDAO{
 
 
 
-
+    /**
+     * Deletes a product from the database using the product object.
+     *
+     * @param p The product to be deleted.
+     */
     public void delete(Product p) {
         String deleteProductQuery = "DELETE FROM Products WHERE ProductCode = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -156,6 +187,11 @@ public class ProductDAO{
         }
     }
 
+    /**
+     * Deletes a product from the database using a product code.
+     *
+     * @param productCode The code of the product to be deleted.
+     */
     public void delete(String productCode) {
         String deleteProductQuery = "DELETE FROM Products WHERE ProductCode = ?";
         try (Connection conn = DBConnection.getConnection();

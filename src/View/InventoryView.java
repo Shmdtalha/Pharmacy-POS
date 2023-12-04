@@ -8,6 +8,11 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.ArrayList;
 
+/**
+ * The InventoryView class is responsible for displaying the inventory management interface.
+ * It includes features to view, add, remove, and update products and categories.
+ * Users can also access expiry view.
+ */
 public class InventoryView extends BaseView {
 
     private JTable inventoryTable;
@@ -21,12 +26,20 @@ public class InventoryView extends BaseView {
     private DefaultListModel<Category> categoryListModel;
     private JScrollPane categoryScrollPane;
 
+    /**
+     * Constructs a new InventoryView with the specified title.
+     *
+     * @param title The title of the inventory view window.
+     */
     public InventoryView(String title) {
         super(title);
 
     }
 
-
+    /**
+     * Initializes the User interface components
+     * through this inherited method.
+     */
     @Override
     protected void initializeComponents() {
         setLayout(new BorderLayout());
@@ -59,7 +72,7 @@ public class InventoryView extends BaseView {
         priceLabel = new JLabel("Price:");
         priceField = new JTextField();
 
-       //Adding components to input panel
+        //Adding components to input panel
         inputPanel.add(productCodeLabel);
         inputPanel.add(productcodefield);
         inputPanel.add(productNameLabel);
@@ -115,6 +128,11 @@ public class InventoryView extends BaseView {
         return categoryList;
     }
 
+    /**
+     * Refreshes list for categories after they are added or removed
+     *
+     * @param categories The list of categories that need to be updated
+     */
     public void updateCategoryList(java.util.List<Category> categories) {
         SwingUtilities.invokeLater(() -> {
             categoryListModel.clear();
@@ -125,7 +143,7 @@ public class InventoryView extends BaseView {
                 }
             }
         });
-        }
+    }
     public void addProductToTable(String code, String name, int quantity, double price, String category) {
         Object[] rowData = new Object[] {code, name, quantity, price, category};
         inventoryModel.addRow(rowData);

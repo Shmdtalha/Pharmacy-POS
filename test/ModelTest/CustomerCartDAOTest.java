@@ -1,6 +1,7 @@
 package ModelTest;
 
 import Model.DAO.CustomerCartDAO;
+import Model.DAO.ProductDAO;
 import Model.Entity.CustomerCart;
 import Model.Entity.Item;
 import Util.DBConnection;
@@ -57,7 +58,7 @@ class CustomerCartDAOTest {
         cart.setCustomerName("Customer");
         cart.setItems(Arrays.asList(new Item(2, 9.99, 2*9.99, "P001", "Product1"), new Item(3, 19.99,3*19.99, "P002", "Product2")));
 
-        customerCartDAO.createCustomerCartWithProducts(cart);
+        customerCartDAO.createCustomerCartWithProducts(cart, new ProductDAO());
 
         verify(pstCart, times(1)).executeUpdate(); // Verify cart insertion
         verify(pstCartProduct, times(1)).executeBatch(); // Verify batch insert for cart products

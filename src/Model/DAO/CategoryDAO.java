@@ -10,8 +10,17 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The CategoryDAO (Data Access Object) class is responsible for handling all database operations
+ * related to categories. This includes saving, updating, loading, and deleting category records.
+ */
 public class CategoryDAO{
 
+    /**
+     * Saves a new category to the database. Inserts a category with its details into the Categories table.
+     *
+     * @param c The category to be saved.
+     */
     public void save(Category c) {
         String insertCategoryQuery = "INSERT INTO Categories (categoryCode, categoryName, description, parentCategoryCode) VALUES (?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
@@ -34,6 +43,11 @@ public class CategoryDAO{
         }
     }
 
+    /**
+     * Loads all categories from the database. Retrieves all category records from the Categories table.
+     *
+     * @return A list of all categories.
+     */
     public List<Category> loadAll() {
         List<Category> categories = new ArrayList<>();
         String query = "SELECT * FROM Categories";
@@ -58,6 +72,12 @@ public class CategoryDAO{
         return categories;
     }
 
+    /**
+     * Updates a category in the database. Modifies the details of an existing category in the Categories table.
+     *
+     * @param category The category with updated information.
+     * @param oldCode The original code of the category to be updated.
+     */
     public void update(Category category, String oldCode) {
         String sql = "UPDATE categories SET categoryName = ?, description = ?, categoryCode = ? WHERE categoryCode = ?";
         try (Connection connection = DBConnection.getConnection();
@@ -73,7 +93,11 @@ public class CategoryDAO{
         }
     }
 
-
+    /**
+     * Deletes a category from the database. Removes a category record from the Categories table.
+     *
+     * @param c The category to be deleted.
+     */
     public void delete(Category c) {
         String deleteCategoryQuery = "DELETE FROM Categories WHERE categoryCode = ?";
         try (Connection conn = DBConnection.getConnection();
