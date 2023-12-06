@@ -2,12 +2,15 @@ package Model.DAO;
 
 import Model.Entity.CustomerCart;
 import Model.Entity.Item;
+import Model.Entity.User;
 import Util.DBConnection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -23,7 +26,7 @@ public class CustomerCartDAO {
      * It also updates the stock quantity of each product in the cart.
      *
      * @param customerCart The customer cart to be created in the database.
-     * @param productDAO The ProductDAO instance for handling product-related operations.
+     * @param productDAO   The ProductDAO instance for handling product-related operations.
      * @throws SQLException if there is an error in database access or query execution.
      */
     public void createCustomerCartWithProducts(CustomerCart customerCart, ProductDAO productDAO) throws SQLException {
@@ -37,11 +40,10 @@ public class CustomerCartDAO {
         String insertCartQuery = "INSERT INTO CustomerCarts (cartId, customerName, totalAmount) VALUES (?, ?, ?)";
         String insertCartProductQuery = "INSERT INTO CartProducts (cartId, productCode, quantity, productPrice) VALUES (?, ?, ?, ?)";
 
-        try(Connection conn = DBConnection.getConnection();
-            PreparedStatement pstCart = conn.prepareStatement(insertCartQuery);
-            PreparedStatement pstCartProduct = conn.prepareStatement(insertCartProductQuery)
-        )
-        {
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstCart = conn.prepareStatement(insertCartQuery);
+             PreparedStatement pstCartProduct = conn.prepareStatement(insertCartProductQuery)
+        ) {
             // Insert the cart with the generated ID
             pstCart.setString(1, customerCart.getCartId());
             pstCart.setString(2, customerCart.getCustomerName());
@@ -70,5 +72,35 @@ public class CustomerCartDAO {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
+    }
+
+    public List<CustomerCart> getCustomerCart(String idLower, String idUpper) {
+
+        System.out.println(idLower);
+        System.out.println(idUpper);
+
+        String query = "SELECT * FROM CustomerCarts WHERE cartId >= ? AND cartId <= ?";
+        List<CustomerCart> result = new ArrayList<CustomerCart>();
+
+        try {
+            Connection conn = DBConnection.getConnection();
+            PreparedStatement pst = conn.prepareStatement(query);
+            pst.setString(1, idLower);
+            pst.setString(2, idUpper);
+            ResultSet count = pst.executeQuery();
+
+            while(count.next()) {
+                CustomerCart c = new CustomerCart();
+                c.setCartId(count.getString(1));
+                c.setCustomerName(count.getString(2));
+                c.setTotalAmount(count.getDouble(3));
+
+                result.add(c);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return result;
     }
 }

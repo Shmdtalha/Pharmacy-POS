@@ -15,6 +15,7 @@ public class Product {
     public String getCode() { return code; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+
     public String getDescription() { return description; }
     public int getStockQuantity() { return stockQuantity; }
     public double getPrice() { return price; }

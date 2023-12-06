@@ -1,7 +1,12 @@
 package Service;
 import View.BaseView;
+import View.LoginView;
+import View.ReportView;
 
 public class ReportService extends BaseService{
+
+    ReportView reportView;
+
     public ReportService(BaseView view) {
         super(view);
     }
@@ -13,7 +18,7 @@ public class ReportService extends BaseService{
 
     @Override
     protected void setChildReference() {
-
+        reportView = ((ReportView)view);
     }
 
     @Override
