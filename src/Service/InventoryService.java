@@ -8,6 +8,8 @@ import View.DialogWindow.AddCategoryView;
 import View.DialogWindow.ManageCategoryView;
 import View.DialogWindow.ManageExpiryView;
 import View.InventoryView;
+import View.LoginView;
+import View.MainDashboardView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -63,7 +65,15 @@ public class InventoryService extends BaseService{
 
     @Override
     protected void addListeners() {
-        System.out.println("Adding Listeners");
+
+        inventoryView.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent event) {
+                inventoryView.setVisible(false);
+                new MainDashboardService(new MainDashboardView("Main Dashboard"));
+            }
+        });
+
         inventoryView.getAddButton().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

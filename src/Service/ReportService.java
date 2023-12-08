@@ -1,7 +1,11 @@
 package Service;
 import View.BaseView;
 import View.LoginView;
+import View.MainDashboardView;
 import View.ReportView;
+
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class ReportService extends BaseService{
 
@@ -29,6 +33,13 @@ public class ReportService extends BaseService{
     @Override
     protected void addListeners() {
 
+        reportView.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent event) {
+                reportView.setVisible(false);
+                new MainDashboardService(new MainDashboardView("Main Dashboard"));
+            }
+        });
     }
 
     @Override

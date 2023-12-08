@@ -3,6 +3,8 @@ import View.*;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class MainDashboardService extends BaseService{
 
@@ -32,6 +34,14 @@ public class MainDashboardService extends BaseService{
 
     @Override
     protected void addListeners() {
+
+        mainDashboardView.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent event) {
+                mainDashboardView.setVisible(false);
+                new LoginService(new LoginView("Login"));
+            }
+        });
 
         mainDashboardView.getCreateNewSaleButton().addActionListener(new ActionListener() {
 

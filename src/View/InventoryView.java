@@ -42,6 +42,7 @@ public class InventoryView extends BaseView {
      */
     @Override
     protected void initializeComponents() {
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLayout(new BorderLayout());
         String[] columnNames = {"Product Code", "Product Name", "Quantity", "Price", "Category"};
         inventoryTable = new JTable();

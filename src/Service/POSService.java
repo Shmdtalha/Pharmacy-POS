@@ -7,6 +7,7 @@ import Model.Entity.Item;
 import Model.Entity.Product;
 import View.DialogWindow.InvoiceDetailsView;
 import View.DialogWindow.ManageCategoryView;
+import View.MainDashboardView;
 import View.POSView;
 import View.BaseView;
 
@@ -54,6 +55,14 @@ public class POSService extends BaseService {
 
     @Override
     protected void addListeners() {
+
+        posView.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent event) {
+                posView.setVisible(false);
+                new MainDashboardService(new MainDashboardView("Main Dashboard"));
+            }
+        });
 
         posView.getSearchField().addKeyListener(new KeyAdapter() {
             @Override

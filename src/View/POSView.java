@@ -1,10 +1,13 @@
 package View;
 
 import Model.Entity.Product;
+import Service.MainDashboardService;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
  * The POSView class represents the point of sale interface.
@@ -35,7 +38,7 @@ public class POSView extends BaseView {
     @Override
     protected void initializeComponents() {
         setLayout(new BorderLayout());
-
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         itemsModel = new DefaultTableModel(new Object[]{"Product Code", "Product Name", "Price", "Quantity", "Total"}, 0) {
             @Override
             public Class<?> getColumnClass(int columnIndex) {

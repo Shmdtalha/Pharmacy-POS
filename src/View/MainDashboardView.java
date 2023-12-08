@@ -23,6 +23,7 @@ public class MainDashboardView extends BaseView{
     @Override
     protected void initializeComponents() {
 
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         ui = new JPanel();
         createNewSaleButton = new JButton("New Sale");
         productCatalogButton = new JButton("Product Catalog");

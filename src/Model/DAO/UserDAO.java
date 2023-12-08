@@ -25,10 +25,8 @@ public class UserDAO {
 
         try{
             Connection conn = DBConnection.getConnection();
-            System.out.println("Hello1");
             PreparedStatement pst = conn.prepareStatement(query);
             pst.setString(1, username);
-            System.out.println("Hello2");
             pst.setString(2, password);
             ResultSet count = pst.executeQuery();
             boolean isFound = false;
@@ -41,12 +39,6 @@ public class UserDAO {
                 u.setName(count.getString(2));
                 u.setUsername(count.getString(4));
                 u.setPassword(count.getString(5));
-
-                System.out.println(count.getString(1));
-                System.out.println(count.getString(2));
-                System.out.println(count.getString(3));
-                System.out.println(count.getString(4));
-                System.out.println(count.getString(5));
 
                 if(count.getString(3) == "MANAGER_ROLE"){
                     Manager m = new Manager();

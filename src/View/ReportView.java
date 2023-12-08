@@ -2,6 +2,7 @@ package View;
 
 import Model.DAO.CustomerCartDAO;
 import Model.Entity.CustomerCart;
+import Service.MainDashboardService;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.swing.JRViewer;
@@ -9,6 +10,8 @@ import net.sf.jasperreports.swing.JRViewer;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -27,6 +30,8 @@ public class ReportView extends BaseView{
 
     @Override
     protected void initializeComponents() {
+
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
         dailyButton = new JButton("Daily Report");
         weeklyButton = new JButton("Weekly Report");
@@ -62,14 +67,16 @@ public class ReportView extends BaseView{
             @Override
             public void actionPerformed(ActionEvent e) {
 
+                List<CustomerCart> trans = null;
                 List<Transaction> transactions = new ArrayList<>();
                 double totalSales = 0.0;
-                int totalItemsSold = 0;
-
+                String idLower = "";
+                String idUpper = "";
+                String reportType = "";
 
                 try {
 
-                    String reportType = "Daily";
+                    reportType = "Daily";
 
                     if(dateSpinner.getModel() instanceof DailySpinnerModel){
 
@@ -85,28 +92,8 @@ public class ReportView extends BaseView{
                         date1 = date1.concat(String.valueOf(date.charAt(8)));
                         date1 = date1.concat(String.valueOf(date.charAt(9)));
 
-                        String idLower = date1.concat("000000");
-                        String idUpper = date1.concat("235959");
-
-                        List<CustomerCart> trans = customerCartDAO.getCustomerCart(idLower, idUpper);
-
-                        for(int i = 0; i < trans.size(); i++){
-                            String dateTrans = String.valueOf(trans.get(i).getCartId().charAt(4));
-                            dateTrans = dateTrans + String.valueOf(trans.get(i).getCartId().charAt(5));
-                            dateTrans = dateTrans.concat("-");
-                            dateTrans = dateTrans + String.valueOf(trans.get(i).getCartId().charAt(2));
-                            dateTrans = dateTrans + String.valueOf(trans.get(i).getCartId().charAt(3));
-                            dateTrans = dateTrans.concat("-");
-                            dateTrans = dateTrans + String.valueOf(trans.get(i).getCartId().charAt(0));
-                            dateTrans = dateTrans + String.valueOf(trans.get(i).getCartId().charAt(1));
-
-                            Transaction t = new Transaction(trans.get(i).getCartId(),
-                                    dateTrans, trans.get(i).getCustomerName(),
-                                    trans.get(i).getTotalAmount());
-
-                            transactions.add(t);
-                            totalSales += t.getAmount();
-                        }
+                        idLower = date1.concat("000000");
+                        idUpper = date1.concat("235959");
                     }
                     else if(dateSpinner.getModel() instanceof WeeklySpinnerModel){
 
@@ -119,30 +106,8 @@ public class ReportView extends BaseView{
                         System.out.println(date);
                         System.out.println(datee);
 
-                        String idLower = date.concat("000000");
-                        String idUpper = datee.concat("235959");
-
-                        System.out.println(idLower + " " + idUpper);
-
-                        List<CustomerCart> trans = customerCartDAO.getCustomerCart(idLower, idUpper);
-
-                        for(int i = 0; i < trans.size(); i++){
-                            String dateTrans = String.valueOf(trans.get(i).getCartId().charAt(4));
-                            dateTrans = dateTrans + String.valueOf(trans.get(i).getCartId().charAt(5));
-                            dateTrans = dateTrans.concat("-");
-                            dateTrans = dateTrans + String.valueOf(trans.get(i).getCartId().charAt(2));
-                            dateTrans = dateTrans + String.valueOf(trans.get(i).getCartId().charAt(3));
-                            dateTrans = dateTrans.concat("-");
-                            dateTrans = dateTrans + String.valueOf(trans.get(i).getCartId().charAt(0));
-                            dateTrans = dateTrans + String.valueOf(trans.get(i).getCartId().charAt(1));
-
-                            Transaction t = new Transaction(trans.get(i).getCartId(),
-                                    dateTrans, trans.get(i).getCustomerName(),
-                                    trans.get(i).getTotalAmount());
-
-                            transactions.add(t);
-                            totalSales += t.getAmount();
-                        }
+                        idLower = date.concat("000000");
+                        idUpper = datee.concat("235959");
                     }
                     else if(dateSpinner.getModel() instanceof MonthlySpinnerModel){
 
@@ -155,41 +120,39 @@ public class ReportView extends BaseView{
                         System.out.println(date);
                         System.out.println(datee);
 
-                        String idLower = date.concat("000000");
-                        String idUpper = datee.concat("235959");
+                        idLower = date.concat("000000");
+                        idUpper = datee.concat("235959");
 
-                        System.out.println(idLower + " " + idUpper);
-
-                        List<CustomerCart> trans = customerCartDAO.getCustomerCart(idLower, idUpper);
-
-                        for(int i = 0; i < trans.size(); i++){
-                            String dateTrans = String.valueOf(trans.get(i).getCartId().charAt(4));
-                            dateTrans = dateTrans + String.valueOf(trans.get(i).getCartId().charAt(5));
-                            dateTrans = dateTrans.concat("-");
-                            dateTrans = dateTrans + String.valueOf(trans.get(i).getCartId().charAt(2));
-                            dateTrans = dateTrans + String.valueOf(trans.get(i).getCartId().charAt(3));
-                            dateTrans = dateTrans.concat("-");
-                            dateTrans = dateTrans + String.valueOf(trans.get(i).getCartId().charAt(0));
-                            dateTrans = dateTrans + String.valueOf(trans.get(i).getCartId().charAt(1));
-
-                            Transaction t = new Transaction(trans.get(i).getCartId(),
-                                    dateTrans, trans.get(i).getCustomerName(),
-                                    trans.get(i).getTotalAmount());
-
-                            transactions.add(t);
-                            totalSales += t.getAmount();
-                        }
                     }
                     else{
                         return;
+                    }
+
+                    trans = customerCartDAO.getCustomerCart(idLower, idUpper);
+
+                    for(int i = 0; i < trans.size(); i++){
+                        String dateTrans = String.valueOf(trans.get(i).getCartId().charAt(4));
+                        dateTrans = dateTrans + String.valueOf(trans.get(i).getCartId().charAt(5));
+                        dateTrans = dateTrans.concat("-");
+                        dateTrans = dateTrans + String.valueOf(trans.get(i).getCartId().charAt(2));
+                        dateTrans = dateTrans + String.valueOf(trans.get(i).getCartId().charAt(3));
+                        dateTrans = dateTrans.concat("-");
+                        dateTrans = dateTrans + String.valueOf(trans.get(i).getCartId().charAt(0));
+                        dateTrans = dateTrans + String.valueOf(trans.get(i).getCartId().charAt(1));
+
+                        Transaction t = new Transaction(trans.get(i).getCartId(),
+                                dateTrans, trans.get(i).getCustomerName(),
+                                trans.get(i).getTotalAmount());
+
+                        transactions.add(t);
+                        totalSales += t.getAmount();
                     }
 
 
                     JRDataSource dataSource = new JRBeanCollectionDataSource(transactions);
 
                     Map<String, Object> parameters = new HashMap<>();
-                    parameters.put("TotalSales", totalSales); // Replace with the actual total sales value
-                    parameters.put("TotalItemsSold", totalItemsSold); // Replace with the actual total items sold value
+                    parameters.put("TotalSales", totalSales);
                     parameters.put("reportType", reportType);
 
                     // Compile and fill the report
@@ -202,7 +165,15 @@ public class ReportView extends BaseView{
                     reportFrame.add(viewer);
                     reportFrame.setSize(800, 600);
                     reportFrame.setLocationRelativeTo(null);
-                    reportFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                    reportFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+                    reportFrame.addWindowListener(new WindowAdapter() {
+                        @Override
+                        public void windowClosing(WindowEvent event) {
+                            setVisible(false);
+                            reportFrame.setVisible(false);
+                            new ReportView("Report");
+                        }
+                    });
                     reportFrame.setVisible(true);
                 }
                 catch (JRException ex) {
@@ -213,6 +184,14 @@ public class ReportView extends BaseView{
 //                }
             }
 
+        });
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent event) {
+                setVisible(false);
+                new MainDashboardService(new MainDashboardView("Main Dashboard"));
+            }
         });
 
         uiPanel.add(dailyButton);

@@ -2,7 +2,6 @@
 <!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 6.20.6-5c96b6aa8a39ac1dc6b6bea4b81168e16dd39231  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="528708d1-0010-45ea-9875-540ba57c46e5">
     <parameter name="TotalSales" class="java.lang.Double"/>
-    <parameter name="TotalItemsSold" class="java.lang.Integer"/>
     <parameter name="reportType" class="java.lang.String"/>
     <field name="transactionId" class="java.lang.String"/>
     <field name="transactionDate" class="java.lang.String"/>
@@ -146,17 +145,6 @@
             <textField>
                 <reportElement x="148" y="10" width="275" height="20" uuid="95f88f66-ec06-4f3f-a23c-f7927b380cfe"/>
                 <textFieldExpression><![CDATA[$P{TotalSales}]]></textFieldExpression>
-            </textField>
-            <staticText>
-                <reportElement x="0" y="40" width="280" height="20" uuid="a3b8200c-c670-4a96-bf0f-ffd8f6f12a10"/>
-                <textElement>
-                    <font size="11" isBold="true"/>
-                </textElement>
-                <text><![CDATA[Total Items Sold:]]></text>
-            </staticText>
-            <textField>
-                <reportElement x="148" y="40" width="275" height="20" uuid="a9d249a0-41a5-4636-a9ac-34fcba5293c5"/>
-                <textFieldExpression><![CDATA[$P{TotalItemsSold}]]></textFieldExpression>
             </textField>
         </band>
     </summary>
