@@ -32,7 +32,7 @@ public class UserDAO {
             boolean isFound = false;
             User u = null;
 
-            while(count.next()){
+            while(count.next() && !isFound){
                 u = new User();
                 isFound = true;
                 u.setId(count.getString(1));
@@ -40,7 +40,7 @@ public class UserDAO {
                 u.setUsername(count.getString(4));
                 u.setPassword(count.getString(5));
 
-                if(count.getString(3) == "MANAGER_ROLE"){
+                if(count.getString(3).equals("MANAGER_ROLE")){
                     Manager m = new Manager();
                     u.setRole(m);
                 }

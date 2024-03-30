@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"Model.DAO"},{"l":"Model.Entity"},{"l":"ModelTest"},{"l":"Service"},{"l":"Util"},{"l":"View"},{"l":"View.DialogWindow"}];updateSearchResults();

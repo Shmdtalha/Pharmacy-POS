@@ -1,5 +1,6 @@
 package View;
 
+import Model.Entity.SalesAssistant;
 import Service.SessionInfo;
 
 import javax.swing.*;
@@ -23,6 +24,8 @@ public class MainDashboardView extends BaseView{
     @Override
     protected void initializeComponents() {
 
+
+
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         ui = new JPanel();
         createNewSaleButton = new JButton("New Sale");
@@ -31,12 +34,16 @@ public class MainDashboardView extends BaseView{
         reportButton = new JButton("Report");
 
         ui.add(createNewSaleButton);
-        ui.add(productCatalogButton);
         ui.add(inventoryButton);
         ui.add(reportButton);
 
         add(ui);
-        System.out.println(SessionInfo.getUserInstance().getUsername());
+        //System.out.println(SessionInfo.getUserInstance().getUsername());
+
+        if(SessionInfo.getUserInstance().getRole() instanceof SalesAssistant){
+            inventoryButton.setVisible(false);
+            reportButton.setVisible(false);
+        }
     }
 
     public JPanel getUi() {

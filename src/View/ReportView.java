@@ -156,7 +156,7 @@ public class ReportView extends BaseView{
                     parameters.put("reportType", reportType);
 
                     // Compile and fill the report
-                    JasperReport jasperReport = JasperCompileManager.compileReport("D:\\Programming\\UNI\\SCD Project\\Pharmacy-POS\\src\\View\\report.jrxml");
+                    JasperReport jasperReport = JasperCompileManager.compileReport("C:\\Users\\abson\\Desktop\\Pharmacy-POS\\src\\View\\report.jrxml");
                     JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
 
                     // Display report

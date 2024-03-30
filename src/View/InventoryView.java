@@ -96,8 +96,8 @@ public class InventoryView extends BaseView {
         //Adding components to Button Panel
         buttonPanel.add(addButton);
         buttonPanel.add(removeButton);
-        buttonPanel.add(updateButton);
-        buttonPanel.add(submitButton);
+       // buttonPanel.add(updateButton);
+        //buttonPanel.add(submitButton);
         buttonPanel.add(addCategoryButton);
         buttonPanel.add(manageCategoriesButton);
         buttonPanel.add(manageExpiryButton);
