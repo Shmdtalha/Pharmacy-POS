@@ -12,6 +12,6 @@ public class Main {
 //        new InventoryService(new InventoryView("Inventory View"));
 //        new POSService(new POSView("Point Of Sales"));
         new LoginService(new LoginView("Login"));
-//        new MainDashboardService(new MainDashboardView("Main Dashboard"));
+      //new MainDashboardService(new MainDashboardView("Main Dashboard"));
     }
 }

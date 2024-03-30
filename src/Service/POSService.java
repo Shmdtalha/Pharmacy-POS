@@ -10,6 +10,10 @@ import View.DialogWindow.ManageCategoryView;
 import View.MainDashboardView;
 import View.POSView;
 import View.BaseView;
+import View.ReportView;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.swing.JRViewer;
 
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
@@ -17,7 +21,9 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class POSService extends BaseService {
     private POSView posView;
@@ -173,7 +179,7 @@ public class POSService extends BaseService {
 
                         double productPrice = (Double) model.getValueAt(i, 2);
                         double totalPrice = (Double) model.getValueAt(i, 4);
-                        Item rowItem = new Item(quantityNeeded, productPrice, totalPrice, productCode, "");
+                        Item rowItem = new Item(quantityNeeded, productPrice, totalPrice, productCode, String.valueOf(model.getValueAt(i, 1)));
                         customerCart.add(rowItem);
                         cartPrice += totalPrice;
                     }
@@ -193,8 +199,49 @@ public class POSService extends BaseService {
         invoiceDetailsView.getGenerateInvoiceButton().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
                 try {
+                    double invoiceAmount = Double.parseDouble(invoiceDetailsView.getInvoiceAmountField().getText());
+                    double amountPaid = Double.parseDouble(invoiceDetailsView.getAmountPaidField().getText());
+                    double change = amountPaid - invoiceAmount;
+
+                    if (change < 0) {
+                        JOptionPane.showMessageDialog(invoiceDetailsView, "Amount paid is less than the invoice amount. Please enter a valid amount.", "Invalid Amount", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+
+                    List<Item> items =  customerCart.getItems();
+
+                    for(int i = 0; i < items.size(); i++) {
+                        System.out.println(items.get(i).getProductName());
+                        System.out.println(items.get(i).getQuantity());
+                    }
+
+                    JRDataSource dataSource = new JRBeanCollectionDataSource(items);
+
+                    Map<String, Object> parameters = new HashMap<>();
+                    parameters.put("grandTotal", invoiceAmount);
+                    parameters.put("loggedPerson", SessionInfo.getUserInstance().getName());
+
+                    // Compile and fill the report
+                    JasperReport jasperReport = JasperCompileManager.compileReport("C:\\Users\\abson\\Desktop\\Pharmacy-POS\\src\\View\\invoice.jrxml");
+                    JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
+
+                    // Display report
+                    JRViewer viewer = new JRViewer(jasperPrint);
+                    JFrame reportFrame = new JFrame("Invoice");
+                    reportFrame.add(viewer);
+                    reportFrame.setSize(800, 600);
+                    reportFrame.setLocationRelativeTo(null);
+                    reportFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+                    reportFrame.addWindowListener(new WindowAdapter() {
+                        @Override
+                        public void windowClosing(WindowEvent event) {
+                            reportFrame.setVisible(false);
+                        }
+                    });
+                    reportFrame.setVisible(true);
+                    reportFrame.toFront();
+
                     customerCart.setCustomerName(invoiceDetailsView.getCustomerNameField().getText());
                     new CustomerCartDAO().createCustomerCartWithProducts(customerCart, productDAO);
                     customerCart.clear();
@@ -202,29 +249,45 @@ public class POSService extends BaseService {
                     JOptionPane.showMessageDialog(posView, "Order processed successfully.");
                 } catch (SQLException ex) {
                     throw new RuntimeException(ex);
+                }catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(invoiceDetailsView, "Invalid input. Please enter valid numbers.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                } catch (JRException ex) {
+                    throw new RuntimeException(ex);
                 }
             }
         });
 
-        invoiceDetailsView.getAmountPaidField().addKeyListener(new KeyListener() {
+        invoiceDetailsView.getAmountPaidField().addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
-
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-
+                char c = e.getKeyChar();
+                if (!Character.isDigit(c) && c != KeyEvent.VK_BACK_SPACE && c != KeyEvent.VK_DELETE && c != '.') {
+                    e.consume();
+                }
             }
 
             @Override
             public void keyReleased(KeyEvent e) {
-                Double change = Double.parseDouble(invoiceDetailsView.getAmountPaidField().getText()) - Double.parseDouble(invoiceDetailsView.getInvoiceAmountField().getText());
-                invoiceDetailsView.getChangeField().setText(String.valueOf(change));
+                String amountPaidText = invoiceDetailsView.getAmountPaidField().getText();
+                if (!amountPaidText.isEmpty()) {
+                    try {
+                        double amountPaid = Double.parseDouble(amountPaidText);
+                        double invoiceAmount = Double.parseDouble(invoiceDetailsView.getInvoiceAmountField().getText());
+                        double change = amountPaid - invoiceAmount;
+                        invoiceDetailsView.getChangeField().setText(String.format("%.2f", change));
+                    } catch (NumberFormatException ex) {
+                        invoiceDetailsView.getChangeField().setText("");
+                    }
+                } else {
+                    invoiceDetailsView.getChangeField().setText("");
+                }
             }
+
         });
 
-        posView.getClearButton().addActionListener(e-> {
+
+
+        posView.getClearButton().addActionListener(e -> {
             refreshView();
         });
 
@@ -280,7 +343,7 @@ public class POSService extends BaseService {
 
     private void addProductToTable(Product product) {
         DefaultTableModel model = (DefaultTableModel) posView.getItemsTable().getModel();
-        Object[] row = new Object[] {
+        Object[] row = new Object[]{
                 product.getCode(),
                 product.getName(),
                 product.getPrice(),
